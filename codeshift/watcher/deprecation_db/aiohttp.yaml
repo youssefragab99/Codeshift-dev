@@ -1,0 +1,126 @@
+# aiohttp Deprecation Database
+# Patterns that are deprecated in aiohttp 3.x
+
+library: aiohttp
+display_name: aiohttp
+documentation_url: https://docs.aiohttp.org/en/stable/
+
+release_cycle:
+  typical_major_interval_months: 24
+  current_version: "3.9"
+  next_major_estimated: "2025-Q3"
+
+deprecations:
+  # Loop parameter deprecations
+  - id: aiohttp-loop-parameter
+    pattern: "loop="
+    pattern_type: regex
+    deprecated_in: "3.8"
+    removed_in: "4.0"
+    severity: warning
+    message: "loop parameter is deprecated, asyncio handles event loop automatically"
+    replacement: "Remove loop parameter, use asyncio.get_event_loop() if needed"
+    link: "https://docs.aiohttp.org/en/stable/client_quickstart.html"
+    auto_fixable: true
+    transform_name: remove_loop_parameter
+
+  # Connector deprecations
+  - id: aiohttp-connector-force-close
+    pattern: "force_close="
+    pattern_type: regex
+    context: "in TCPConnector"
+    deprecated_in: "3.0"
+    removed_in: "4.0"
+    severity: deprecated
+    message: "force_close parameter is deprecated, use enable_cleanup_closed"
+    replacement: "enable_cleanup_closed=True"
+    link: "https://docs.aiohttp.org/en/stable/client_reference.html#aiohttp.TCPConnector"
+    auto_fixable: true
+    transform_name: force_close_to_enable_cleanup
+
+  # ClientSession deprecations
+  - id: aiohttp-session-connector-owner
+    pattern: "connector_owner="
+    pattern_type: regex
+    deprecated_in: "3.7"
+    removed_in: "4.0"
+    severity: deprecated
+    message: "connector_owner parameter is deprecated"
+    replacement: "Remove connector_owner, session manages connector lifecycle"
+    link: "https://docs.aiohttp.org/en/stable/client_reference.html"
+    auto_fixable: true
+    transform_name: remove_connector_owner
+
+  # Request methods deprecations
+  - id: aiohttp-chunked-encoding
+    pattern: "chunked="
+    pattern_type: regex
+    context: "in request methods"
+    deprecated_in: "3.0"
+    removed_in: null
+    severity: info
+    message: "chunked parameter rarely needed, aiohttp handles chunking automatically"
+    replacement: "Remove chunked parameter for automatic handling"
+    link: "https://docs.aiohttp.org/en/stable/client_quickstart.html"
+    auto_fixable: false
+
+  # Response deprecations
+  - id: aiohttp-response-content-type
+    pattern: ".content_type"
+    pattern_type: attribute
+    deprecated_in: "3.0"
+    removed_in: null
+    severity: info
+    message: "Use headers['Content-Type'] for full Content-Type header"
+    replacement: "response.headers.get('Content-Type')"
+    link: "https://docs.aiohttp.org/en/stable/client_reference.html"
+    auto_fixable: false
+
+  # BasicAuth deprecation
+  - id: aiohttp-basicauth-encoding
+    pattern: "BasicAuth(encoding="
+    pattern_type: regex
+    deprecated_in: "3.8"
+    removed_in: "4.0"
+    severity: deprecated
+    message: "encoding parameter in BasicAuth is deprecated"
+    replacement: "BasicAuth(login, password)"
+    link: "https://docs.aiohttp.org/en/stable/client_reference.html#aiohttp.BasicAuth"
+    auto_fixable: true
+    transform_name: basicauth_remove_encoding
+
+  # Web server deprecations
+  - id: aiohttp-web-run-app-print
+    pattern: "run_app(print="
+    pattern_type: regex
+    deprecated_in: "3.8"
+    removed_in: "4.0"
+    severity: deprecated
+    message: "print parameter in run_app is deprecated"
+    replacement: "Use logging for output instead"
+    link: "https://docs.aiohttp.org/en/stable/web_reference.html"
+    auto_fixable: false
+
+  # Websocket deprecations
+  - id: aiohttp-ws-connect-autoping
+    pattern: "autoping="
+    pattern_type: regex
+    deprecated_in: "3.0"
+    removed_in: null
+    severity: info
+    message: "autoping default is True, only specify if disabling"
+    replacement: "Remove autoping=True if using default behavior"
+    link: "https://docs.aiohttp.org/en/stable/client_quickstart.html#websockets"
+    auto_fixable: false
+
+  # @middleware decorator deprecation
+  - id: aiohttp-middleware-decorator
+    pattern: "@middleware"
+    pattern_type: decorator
+    deprecated_in: "3.0"
+    removed_in: null
+    severity: info
+    message: "Consider using middleware factories for more flexibility"
+    replacement: "def middleware_factory(): async def middleware(request, handler): ..."
+    link: "https://docs.aiohttp.org/en/stable/web_advanced.html#middlewares"
+    auto_fixable: false

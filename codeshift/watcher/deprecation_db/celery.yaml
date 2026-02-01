@@ -1,0 +1,141 @@
+# Celery Deprecation Database
+# Patterns that are deprecated in Celery 5.x
+
+library: celery
+display_name: Celery
+documentation_url: https://docs.celeryq.dev/en/stable/whatsnew-5.0.html
+
+release_cycle:
+  typical_major_interval_months: 24
+  current_version: "5.3"
+  next_major_estimated: "2025-Q4"
+
+deprecations:
+  # Task decorator deprecations
+  - id: celery-task-base-decorator
+    pattern: "@celery.task(base="
+    pattern_type: decorator
+    deprecated_in: "4.0"
+    removed_in: null
+    severity: info
+    message: "Consider using bind=True for task self-reference instead of custom base"
+    replacement: "@celery.task(bind=True)"
+    link: "https://docs.celeryq.dev/en/stable/userguide/tasks.html"
+    auto_fixable: false
+
+  # Lowercase settings deprecation
+  - id: celery-lowercase-settings
+    pattern: "CELERY_"
+    pattern_type: regex
+    context: "in Celery configuration"
+    deprecated_in: "4.0"
+    removed_in: "6.0"
+    severity: warning
+    message: "Uppercase CELERY_ settings are deprecated, use lowercase settings"
+    replacement: "Use lowercase setting names (e.g., broker_url instead of CELERY_BROKER_URL)"
+    link: "https://docs.celeryq.dev/en/stable/userguide/configuration.html"
+    auto_fixable: true
+    transform_name: celery_uppercase_to_lowercase
+
+  # BROKER_URL deprecation
+  - id: celery-broker-url-uppercase
+    pattern: "BROKER_URL"
+    pattern_type: regex
+    deprecated_in: "4.0"
+    removed_in: "6.0"
+    severity: warning
+    message: "BROKER_URL is deprecated, use broker_url"
+    replacement: "broker_url = 'redis://localhost:6379/0'"
+    link: "https://docs.celeryq.dev/en/stable/userguide/configuration.html"
+    auto_fixable: true
+    transform_name: broker_url_lowercase
+
+  # Result backend deprecation
+  - id: celery-result-backend-uppercase
+    pattern: "CELERY_RESULT_BACKEND"
+    pattern_type: regex
+    deprecated_in: "4.0"
+    removed_in: "6.0"
+    severity: warning
+    message: "CELERY_RESULT_BACKEND is deprecated, use result_backend"
+    replacement: "result_backend = 'redis://localhost:6379/0'"
+    link: "https://docs.celeryq.dev/en/stable/userguide/configuration.html"
+    auto_fixable: true
+    transform_name: result_backend_lowercase
+
+  # Task imports deprecation
+  - id: celery-task-import
+    pattern: "from celery.task import"
+    pattern_type: import
+    deprecated_in: "4.0"
+    removed_in: "5.0"
+    severity: critical
+    message: "celery.task module is removed, use celery decorators"
+    replacement: "from celery import shared_task"
+    link: "https://docs.celeryq.dev/en/stable/whatsnew-5.0.html"
+    auto_fixable: true
+    transform_name: celery_task_import
+
+  # Chord callback deprecation
+  - id: celery-chord-result
+    pattern: ".get(propagate="
+    pattern_type: method_call
+    context: "on chord result"
+    deprecated_in: "4.0"
+    removed_in: null
+    severity: info
+    message: "Consider using raise_on_error for cleaner error handling"
+    replacement: "chord_result.get(raise_on_error=True)"
+    link: "https://docs.celeryq.dev/en/stable/userguide/canvas.html"
+    auto_fixable: false
+
+  # Kombu transport deprecations
+  - id: celery-amqp-transport
+    pattern: "amqp://"
+    pattern_type: regex
+    context: "in broker_url"
+    deprecated_in: "5.0"
+    removed_in: null
+    severity: info
+    message: "Consider using pyamqp:// for better compatibility"
+    replacement: "pyamqp://user:password@host:5672/vhost"
+    link: "https://docs.celeryq.dev/en/stable/getting-started/backends-and-brokers/rabbitmq.html"
+    auto_fixable: false
+
+  # Task error handling
+  - id: celery-task-throws
+    pattern: "throws="
+    pattern_type: regex
+    context: "in @task decorator"
+    deprecated_in: "4.0"
+    removed_in: null
+    severity: deprecated
+    message: "throws parameter is deprecated, use autoretry_for and retry_kwargs"
+    replacement: "@task(autoretry_for=(Exception,), retry_kwargs={'max_retries': 3})"
+    link: "https://docs.celeryq.dev/en/stable/userguide/tasks.html#automatic-retry-for-known-exceptions"
+    auto_fixable: false
+
+  # Canvas deprecated methods
+  - id: celery-chain-apply-async-publisher
+    pattern: ".apply_async(publisher="
+    pattern_type: method_call
+    deprecated_in: "4.0"
+    removed_in: "5.0"
+    severity: critical
+    message: "publisher parameter is removed, use producer instead"
+    replacement: ".apply_async(producer=producer)"
+    link: "https://docs.celeryq.dev/en/stable/whatsnew-5.0.html"
+    auto_fixable: true
+    transform_name: publisher_to_producer
+
+  # Deprecated beat schedule format
+  - id: celery-beat-schedule-args
+    pattern: "schedule(run_every="
+    pattern_type: method_call
+    deprecated_in: "4.0"
+    removed_in: null
+    severity: deprecated
+    message: "run_every is deprecated, use crontab() or timedelta directly"
+    replacement: "Use crontab(minute='*/15') or timedelta(minutes=15)"
+    link: "https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html"
+    auto_fixable: false

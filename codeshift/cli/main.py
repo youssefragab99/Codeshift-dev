@@ -14,6 +14,7 @@ from codeshift.cli.commands.auth import (
     upgrade_plan,
     whoami,
 )
+from codeshift.cli.commands.deprecations import deprecations
 from codeshift.cli.commands.diff import diff
 from codeshift.cli.commands.scan import scan
 from codeshift.cli.commands.upgrade import upgrade
@@ -46,6 +47,9 @@ cli.add_command(upgrade)
 cli.add_command(upgrade_all)
 cli.add_command(diff)
 cli.add_command(apply)
+
+# Deprecation Early Warning System commands
+cli.add_command(deprecations)
 
 # Auth commands
 cli.add_command(register)

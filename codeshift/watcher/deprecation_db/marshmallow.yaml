@@ -1,0 +1,155 @@
+# Marshmallow Deprecation Database
+# Patterns that are deprecated in Marshmallow 3.x
+
+library: marshmallow
+display_name: Marshmallow
+documentation_url: https://marshmallow.readthedocs.io/en/stable/changelog.html
+
+release_cycle:
+  typical_major_interval_months: 24
+  current_version: "3.21"
+  next_major_estimated: null
+
+deprecations:
+  # Strict mode deprecation
+  - id: marshmallow-strict-mode
+    pattern: "strict=True"
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: critical
+    message: "strict parameter is removed, schemas are always strict in v3"
+    replacement: "Remove strict parameter, handle ValidationError explicitly"
+    link: "https://marshmallow.readthedocs.io/en/stable/upgrading.html#upgrading-to-3-0"
+    auto_fixable: true
+    transform_name: remove_strict_parameter
+
+  # JSON module deprecation
+  - id: marshmallow-json-module
+    pattern: "json_module="
+    pattern_type: regex
+    deprecated_in: "3.0"
+    removed_in: null
+    severity: deprecated
+    message: "json_module parameter is deprecated, use render_module instead"
+    replacement: "render_module=orjson"
+    link: "https://marshmallow.readthedocs.io/en/stable/quickstart.html"
+    auto_fixable: true
+    transform_name: json_module_to_render_module
+
+  # fields.Method load/dump deprecation
+  - id: marshmallow-method-method-name
+    pattern: 'Method(method_name="'
+    pattern_type: regex
+    deprecated_in: "3.0"
+    removed_in: null
+    severity: deprecated
+    message: "method_name parameter is deprecated, use serialize/deserialize"
+    replacement: "Method(serialize='method_name', deserialize='method_name')"
+    link: "https://marshmallow.readthedocs.io/en/stable/api_reference.html#marshmallow.fields.Method"
+    auto_fixable: true
+    transform_name: method_name_to_serialize_deserialize
+
+  # load_only/dump_only in Field constructor
+  - id: marshmallow-missing-load-default
+    pattern: "missing="
+    pattern_type: regex
+    context: "in Field definition"
+    deprecated_in: "3.13"
+    removed_in: null
+    severity: deprecated
+    message: "missing parameter is deprecated, use load_default instead"
+    replacement: "load_default=value"
+    link: "https://marshmallow.readthedocs.io/en/stable/upgrading.html"
+    auto_fixable: true
+    transform_name: missing_to_load_default
+
+  - id: marshmallow-default-dump-default
+    pattern: "default="
+    pattern_type: regex
+    context: "in Field definition"
+    deprecated_in: "3.13"
+    removed_in: null
+    severity: deprecated
+    message: "default parameter is deprecated, use dump_default instead"
+    replacement: "dump_default=value"
+    link: "https://marshmallow.readthedocs.io/en/stable/upgrading.html"
+    auto_fixable: true
+    transform_name: default_to_dump_default
+
+  # Pre/Post load/dump decorators
+  - id: marshmallow-pass-many
+    pattern: "pass_many=True"
+    pattern_type: regex
+    deprecated_in: "3.0"
+    removed_in: null
+    severity: deprecated
+    message: "pass_many is deprecated, decorated method receives each item individually"
+    replacement: "Remove pass_many parameter"
+    link: "https://marshmallow.readthedocs.io/en/stable/extending.html"
+    auto_fixable: true
+    transform_name: remove_pass_many
+
+  # Dict keys/values deprecation
+  - id: marshmallow-dict-keys
+    pattern: "Dict(keys="
+    pattern_type: regex
+    deprecated_in: "3.18"
+    removed_in: null
+    severity: info
+    message: "Consider using Mapping field for more flexibility"
+    replacement: "Mapping(keys=String(), values=Integer())"
+    link: "https://marshmallow.readthedocs.io/en/stable/api_reference.html#marshmallow.fields.Mapping"
+    auto_fixable: false
+
+  # Schema.load return value change
+  - id: marshmallow-load-many-tuple
+    pattern: ".load(many=True)"
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: info
+    message: "In v3, load() returns data directly, not (data, errors) tuple"
+    replacement: "Handle ValidationError exception instead of errors tuple"
+    link: "https://marshmallow.readthedocs.io/en/stable/upgrading.html"
+    auto_fixable: false
+
+  # Schema class Meta options
+  - id: marshmallow-meta-strict
+    pattern: "strict = True"
+    pattern_type: regex
+    context: "in Meta class"
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: critical
+    message: "Meta.strict is removed in v3, schemas are always strict"
+    replacement: "Remove strict from Meta class"
+    link: "https://marshmallow.readthedocs.io/en/stable/upgrading.html"
+    auto_fixable: true
+    transform_name: remove_meta_strict
+
+  # ValidationError import
+  - id: marshmallow-validation-error-import
+    pattern: "from marshmallow.exceptions import ValidationError"
+    pattern_type: import
+    deprecated_in: "3.0"
+    removed_in: null
+    severity: info
+    message: "Import ValidationError directly from marshmallow"
+    replacement: "from marshmallow import ValidationError"
+    link: "https://marshmallow.readthedocs.io/en/stable/api_reference.html"
+    auto_fixable: true
+    transform_name: validation_error_import
+
+  # Nested many parameter
+  - id: marshmallow-nested-default
+    pattern: "Nested(default="
+    pattern_type: regex
+    deprecated_in: "3.13"
+    removed_in: null
+    severity: deprecated
+    message: "Use dump_default for Nested field default values"
+    replacement: "Nested(MySchema, dump_default=[])"
+    link: "https://marshmallow.readthedocs.io/en/stable/api_reference.html#marshmallow.fields.Nested"
+    auto_fixable: true
+    transform_name: nested_default_to_dump_default

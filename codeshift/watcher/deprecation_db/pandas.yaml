@@ -1,0 +1,176 @@
+# Pandas Deprecation Database
+# Patterns that are deprecated in Pandas 2.x
+
+library: pandas
+display_name: Pandas
+documentation_url: https://pandas.pydata.org/docs/whatsnew/
+
+release_cycle:
+  typical_major_interval_months: 12
+  current_version: "2.2"
+  next_major_estimated: "2025-Q4"
+
+deprecations:
+  # append method deprecation
+  - id: pandas-dataframe-append
+    pattern: ".append("
+    pattern_type: method_call
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: critical
+    message: "DataFrame.append() is removed, use pd.concat() instead"
+    replacement: "pd.concat([df1, df2], ignore_index=True)"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: append_to_concat
+
+  # inplace deprecations
+  - id: pandas-inplace-warning
+    pattern: "inplace=True"
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: info
+    message: "inplace operations may be deprecated in future, prefer reassignment"
+    replacement: "df = df.operation() instead of df.operation(inplace=True)"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: false
+
+  # iteritems deprecation
+  - id: pandas-iteritems
+    pattern: ".iteritems()"
+    pattern_type: method_call
+    deprecated_in: "1.5"
+    removed_in: "2.0"
+    severity: critical
+    message: "iteritems() is removed, use items() instead"
+    replacement: "df.items() or series.items()"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: iteritems_to_items
+
+  # swaplevel deprecation
+  - id: pandas-swaplevel-int-arg
+    pattern: ".swaplevel(0, 1)"
+    pattern_type: method_call
+    deprecated_in: "1.5"
+    removed_in: null
+    severity: info
+    message: "Consider using named levels for clarity"
+    replacement: ".swaplevel('level1', 'level2')"
+    link: "https://pandas.pydata.org/docs/"
+    auto_fixable: false
+
+  # datetime parsing deprecations
+  - id: pandas-to-datetime-infer
+    pattern: "infer_datetime_format="
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "infer_datetime_format is deprecated, format inference is automatic"
+    replacement: "Remove infer_datetime_format parameter"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: remove_infer_datetime_format
+
+  # groupby deprecations
+  - id: pandas-groupby-squeeze
+    pattern: ".groupby(squeeze="
+    pattern_type: method_call
+    deprecated_in: "1.1"
+    removed_in: "2.0"
+    severity: critical
+    message: "squeeze parameter in groupby is removed"
+    replacement: "Use .squeeze() method on result if needed"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: groupby_squeeze_to_method
+
+  # read_csv deprecations
+  - id: pandas-read-csv-warn-bad-lines
+    pattern: "warn_bad_lines="
+    pattern_type: regex
+    deprecated_in: "1.3"
+    removed_in: "2.0"
+    severity: critical
+    message: "warn_bad_lines is removed, use on_bad_lines='warn'"
+    replacement: "on_bad_lines='warn'"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: warn_bad_lines_to_on_bad_lines
+
+  - id: pandas-read-csv-error-bad-lines
+    pattern: "error_bad_lines="
+    pattern_type: regex
+    deprecated_in: "1.3"
+    removed_in: "2.0"
+    severity: critical
+    message: "error_bad_lines is removed, use on_bad_lines='error'"
+    replacement: "on_bad_lines='error'"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: error_bad_lines_to_on_bad_lines
+
+  - id: pandas-read-csv-skip-bad-lines
+    pattern: "skip_bad_lines="
+    pattern_type: regex
+    deprecated_in: "1.3"
+    removed_in: "2.0"
+    severity: critical
+    message: "skip_bad_lines is removed, use on_bad_lines='skip'"
+    replacement: "on_bad_lines='skip'"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: skip_bad_lines_to_on_bad_lines
+
+  # NumPy dtype deprecation
+  - id: pandas-numpy-dtype-alias
+    pattern: "np.float"
+    pattern_type: regex
+    deprecated_in: "1.5"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.float alias is removed, use float or np.float64"
+    replacement: "float or np.float64"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: np_float_to_float64
+
+  - id: pandas-numpy-int-alias
+    pattern: "np.int"
+    pattern_type: regex
+    deprecated_in: "1.5"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.int alias is removed, use int or np.int64"
+    replacement: "int or np.int64"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: np_int_to_int64
+
+  # Series/Index deprecations
+  - id: pandas-series-is-monotonic
+    pattern: ".is_monotonic"
+    pattern_type: attribute
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "is_monotonic is deprecated, use is_monotonic_increasing"
+    replacement: "series.is_monotonic_increasing"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: is_monotonic_to_is_monotonic_increasing
+
+  # apply with raw deprecation
+  - id: pandas-apply-reduce
+    pattern: ".apply(reduce="
+    pattern_type: method_call
+    deprecated_in: "1.0"
+    removed_in: "2.0"
+    severity: critical
+    message: "reduce parameter in apply is removed, use result_type"
+    replacement: ".apply(result_type='reduce')"
+    link: "https://pandas.pydata.org/docs/whatsnew/v2.0.0.html"
+    auto_fixable: true
+    transform_name: apply_reduce_to_result_type

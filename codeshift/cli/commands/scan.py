@@ -118,12 +118,24 @@ def is_major_upgrade(current: str, latest: str) -> bool:
     is_flag=True,
     help="Show detailed output",
 )
+@click.option(
+    "--deprecations",
+    is_flag=True,
+    help="Check for deprecated patterns in your code",
+)
+@click.option(
+    "--fail-on",
+    type=click.Choice(["info", "deprecated", "warning", "critical"]),
+    help="Exit with non-zero code if deprecations at this level or higher (requires --deprecations)",
+)
 def scan(
     path: str,
     fetch_changes: bool,
     major_only: bool,
     json_output: bool,
     verbose: bool,
+    deprecations: bool,
+    fail_on: str | None,
 ) -> None:
     """Scan your project for possible dependency migrations.
 
@@ -136,6 +148,8 @@ def scan(
         codeshift scan --fetch-changes
         codeshift scan --major-only
         codeshift scan --json-output
+        codeshift scan --deprecations
+        codeshift scan --deprecations --fail-on warning
     """
     project_path = Path(path).resolve()
     # Load project config (currently unused, reserved for future use)
@@ -363,3 +377,49 @@ def scan(
         console.print(
             "\n[dim]No migrations suggested. Use --fetch-changes for detailed analysis.[/]"
         )
+
+    # Run deprecation check if requested
+    if deprecations:
+        _run_deprecation_check(project_path, json_output, verbose, fail_on)
+
+
+def _run_deprecation_check(
+    project_path: Path,
+    json_output: bool,
+    verbose: bool,
+    fail_on: str | None,
+) -> None:
+    """Run deprecation pattern check on the project."""
+    import sys
+
+    from codeshift.watcher.models import DeprecationSeverity
+    from codeshift.watcher.notifier import ConsoleNotifier, JSONNotifier
+    from codeshift.watcher.scanner import DeprecationScanner
+
+    if not json_output:
+        console.print("\n[bold]Checking for deprecated patterns...[/]\n")
+
+    # Create scanner and run scan
+    project_config = ProjectConfig.from_pyproject(project_path)
+    scanner = DeprecationScanner(project_path, project_config)
+    result = scanner.scan_project()
+
+    # Output results
+    if json_output:
+        notifier = JSONNotifier()
+        notifier.notify(result)
+    else:
+        notifier = ConsoleNotifier(console)
+        notifier.notify(result, verbose=verbose, show_context=False)
+
+    # Handle --fail-on
+    if fail_on and result.matches:
+        fail_severity = DeprecationSeverity.from_string(fail_on)
+        if result.has_severity_at_or_above(fail_severity):
+            count = len(result.filter_by_severity(fail_severity))
+            if not json_output:
+                console.print(
+                    f"\n[red]Failing due to {count} deprecations at "
+                    f"{fail_on.upper()} level or higher[/]"
+                )
+            sys.exit(1)

@@ -1,0 +1,198 @@
+# NumPy Deprecation Database
+# Patterns that are deprecated in NumPy 1.x/2.x
+
+library: numpy
+display_name: NumPy
+documentation_url: https://numpy.org/doc/stable/release/
+
+release_cycle:
+  typical_major_interval_months: 24
+  current_version: "2.0"
+  next_major_estimated: null
+
+deprecations:
+  # Type alias deprecations (major NumPy 2.0 changes)
+  - id: numpy-float-alias
+    pattern: "np.float"
+    pattern_type: regex
+    deprecated_in: "1.20"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.float is removed, use float or np.float64 instead"
+    replacement: "np.float64 or Python's float"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: np_float_to_float64
+
+  - id: numpy-int-alias
+    pattern: "np.int"
+    pattern_type: regex
+    deprecated_in: "1.20"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.int is removed, use int or np.int64 instead"
+    replacement: "np.int64 or Python's int"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: np_int_to_int64
+
+  - id: numpy-bool-alias
+    pattern: "np.bool"
+    pattern_type: regex
+    deprecated_in: "1.20"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.bool is removed, use bool or np.bool_ instead"
+    replacement: "np.bool_ or Python's bool"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: np_bool_to_bool_
+
+  - id: numpy-complex-alias
+    pattern: "np.complex"
+    pattern_type: regex
+    deprecated_in: "1.20"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.complex is removed, use complex or np.complex128 instead"
+    replacement: "np.complex128 or Python's complex"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: np_complex_to_complex128
+
+  - id: numpy-object-alias
+    pattern: "np.object"
+    pattern_type: regex
+    deprecated_in: "1.20"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.object is removed, use object or np.object_ instead"
+    replacement: "np.object_ or Python's object"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: np_object_to_object_
+
+  - id: numpy-str-alias
+    pattern: "np.str"
+    pattern_type: regex
+    deprecated_in: "1.20"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.str is removed, use str or np.str_ instead"
+    replacement: "np.str_ or Python's str"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: np_str_to_str_
+
+  # Matrix deprecation
+  - id: numpy-matrix-class
+    pattern: "np.matrix"
+    pattern_type: regex
+    deprecated_in: "1.15"
+    removed_in: null
+    severity: warning
+    message: "np.matrix is deprecated, use np.ndarray instead"
+    replacement: "np.array() with appropriate operations"
+    link: "https://numpy.org/doc/stable/reference/generated/numpy.matrix.html"
+    auto_fixable: false
+
+  - id: numpy-asmatrix
+    pattern: "np.asmatrix("
+    pattern_type: method_call
+    deprecated_in: "1.15"
+    removed_in: null
+    severity: warning
+    message: "np.asmatrix is deprecated, use np.asarray instead"
+    replacement: "np.asarray()"
+    link: "https://numpy.org/doc/stable/reference/generated/numpy.asmatrix.html"
+    auto_fixable: true
+    transform_name: asmatrix_to_asarray
+
+  # msort deprecation
+  - id: numpy-msort
+    pattern: "np.msort("
+    pattern_type: method_call
+    deprecated_in: "1.24"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.msort is removed, use np.sort(a, axis=0) instead"
+    replacement: "np.sort(a, axis=0)"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: msort_to_sort
+
+  # Product deprecation
+  - id: numpy-product
+    pattern: "np.product("
+    pattern_type: method_call
+    deprecated_in: "1.25"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.product is removed, use np.prod instead"
+    replacement: "np.prod()"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: product_to_prod
+
+  # Cumproduct deprecation
+  - id: numpy-cumproduct
+    pattern: "np.cumproduct("
+    pattern_type: method_call
+    deprecated_in: "1.25"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.cumproduct is removed, use np.cumprod instead"
+    replacement: "np.cumprod()"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: cumproduct_to_cumprod
+
+  # Sometrue/alltrue deprecations
+  - id: numpy-sometrue
+    pattern: "np.sometrue("
+    pattern_type: method_call
+    deprecated_in: "1.25"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.sometrue is removed, use np.any instead"
+    replacement: "np.any()"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: sometrue_to_any
+
+  - id: numpy-alltrue
+    pattern: "np.alltrue("
+    pattern_type: method_call
+    deprecated_in: "1.25"
+    removed_in: "2.0"
+    severity: critical
+    message: "np.alltrue is removed, use np.all instead"
+    replacement: "np.all()"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: true
+    transform_name: alltrue_to_all
+
+  # String operations deprecations
+  - id: numpy-string-operations
+    pattern: "np.char."
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: info
+    message: "np.char module may have performance issues, consider using np.strings"
+    replacement: "Consider np.strings module for string operations"
+    link: "https://numpy.org/doc/stable/release/2.0.0-notes.html"
+    auto_fixable: false
+
+  # In1d deprecation
+  - id: numpy-in1d
+    pattern: "np.in1d("
+    pattern_type: method_call
+    deprecated_in: "1.25"
+    removed_in: null
+    severity: deprecated
+    message: "np.in1d is deprecated, use np.isin instead"
+    replacement: "np.isin()"
+    link: "https://numpy.org/doc/stable/reference/generated/numpy.in1d.html"
+    auto_fixable: true
+    transform_name: in1d_to_isin

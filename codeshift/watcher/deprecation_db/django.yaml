@@ -1,0 +1,186 @@
+# Django Deprecation Database
+# Patterns that are deprecated in Django 4.x/5.x
+
+library: django
+display_name: Django
+documentation_url: https://docs.djangoproject.com/en/stable/releases/
+
+release_cycle:
+  typical_major_interval_months: 8
+  current_version: "5.0"
+  next_major_estimated: "2025-Q2"
+
+deprecations:
+  # URL patterns deprecations
+  - id: django-url-patterns
+    pattern: "url("
+    pattern_type: method_call
+    deprecated_in: "3.1"
+    removed_in: "4.0"
+    severity: critical
+    message: "url() is removed, use path() or re_path() instead"
+    replacement: "path('route/', view) or re_path(r'^pattern$', view)"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/#features-removed-in-4-0"
+    auto_fixable: true
+    transform_name: url_to_path
+
+  - id: django-url-import
+    pattern: "from django.conf.urls import url"
+    pattern_type: import
+    deprecated_in: "3.1"
+    removed_in: "4.0"
+    severity: critical
+    message: "url import is removed, use path or re_path from django.urls"
+    replacement: "from django.urls import path, re_path"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: import_url_to_path
+
+  # Force text deprecations
+  - id: django-force-text
+    pattern: "force_text("
+    pattern_type: method_call
+    deprecated_in: "3.0"
+    removed_in: "4.0"
+    severity: critical
+    message: "force_text() is removed, use force_str() instead"
+    replacement: "force_str(value)"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: force_text_to_force_str
+
+  - id: django-force-text-import
+    pattern: "from django.utils.encoding import force_text"
+    pattern_type: import
+    deprecated_in: "3.0"
+    removed_in: "4.0"
+    severity: critical
+    message: "force_text is removed, use force_str instead"
+    replacement: "from django.utils.encoding import force_str"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: import_force_text_to_force_str
+
+  # Smart text deprecations
+  - id: django-smart-text
+    pattern: "smart_text("
+    pattern_type: method_call
+    deprecated_in: "3.0"
+    removed_in: "4.0"
+    severity: critical
+    message: "smart_text() is removed, use smart_str() instead"
+    replacement: "smart_str(value)"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: smart_text_to_smart_str
+
+  # ugettext deprecations
+  - id: django-ugettext
+    pattern: "ugettext("
+    pattern_type: method_call
+    deprecated_in: "3.0"
+    removed_in: "4.0"
+    severity: critical
+    message: "ugettext() is removed, use gettext() instead"
+    replacement: "gettext(message)"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: ugettext_to_gettext
+
+  - id: django-ugettext-lazy
+    pattern: "ugettext_lazy("
+    pattern_type: method_call
+    deprecated_in: "3.0"
+    removed_in: "4.0"
+    severity: critical
+    message: "ugettext_lazy() is removed, use gettext_lazy() instead"
+    replacement: "gettext_lazy(message)"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: ugettext_lazy_to_gettext_lazy
+
+  - id: django-ugettext-noop
+    pattern: "ugettext_noop("
+    pattern_type: method_call
+    deprecated_in: "3.0"
+    removed_in: "4.0"
+    severity: critical
+    message: "ugettext_noop() is removed, use gettext_noop() instead"
+    replacement: "gettext_noop(message)"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: ugettext_noop_to_gettext_noop
+
+  - id: django-ungettext
+    pattern: "ungettext("
+    pattern_type: method_call
+    deprecated_in: "3.0"
+    removed_in: "4.0"
+    severity: critical
+    message: "ungettext() is removed, use ngettext() instead"
+    replacement: "ngettext(singular, plural, number)"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: ungettext_to_ngettext
+
+  # NullBooleanField deprecation
+  - id: django-nullbooleanfield
+    pattern: "NullBooleanField"
+    pattern_type: regex
+    deprecated_in: "3.1"
+    removed_in: "4.0"
+    severity: critical
+    message: "NullBooleanField is removed, use BooleanField(null=True) instead"
+    replacement: "BooleanField(null=True)"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: nullbooleanfield_to_booleanfield
+
+  # Default app config deprecation
+  - id: django-default-app-config
+    pattern: "default_app_config"
+    pattern_type: regex
+    deprecated_in: "3.2"
+    removed_in: "5.0"
+    severity: warning
+    message: "default_app_config is deprecated, Django auto-discovers AppConfig now"
+    replacement: "Remove default_app_config, ensure AppConfig is properly configured"
+    link: "https://docs.djangoproject.com/en/4.0/releases/3.2/"
+    auto_fixable: false
+
+  # STATICFILES_STORAGE deprecation
+  - id: django-staticfiles-storage
+    pattern: "STATICFILES_STORAGE"
+    pattern_type: regex
+    deprecated_in: "4.2"
+    removed_in: "5.1"
+    severity: warning
+    message: "STATICFILES_STORAGE is deprecated, use STORAGES['staticfiles'] instead"
+    replacement: "STORAGES = {'staticfiles': {'BACKEND': '...'}}"
+    link: "https://docs.djangoproject.com/en/5.0/releases/4.2/"
+    auto_fixable: false
+
+  # DEFAULT_FILE_STORAGE deprecation
+  - id: django-default-file-storage
+    pattern: "DEFAULT_FILE_STORAGE"
+    pattern_type: regex
+    deprecated_in: "4.2"
+    removed_in: "5.1"
+    severity: warning
+    message: "DEFAULT_FILE_STORAGE is deprecated, use STORAGES['default'] instead"
+    replacement: "STORAGES = {'default': {'BACKEND': '...'}}"
+    link: "https://docs.djangoproject.com/en/5.0/releases/4.2/"
+    auto_fixable: false
+
+  # JSONField import deprecation
+  - id: django-jsonfield-postgres
+    pattern: "from django.contrib.postgres.fields import JSONField"
+    pattern_type: import
+    deprecated_in: "3.1"
+    removed_in: "4.0"
+    severity: critical
+    message: "JSONField moved from postgres to standard fields"
+    replacement: "from django.db.models import JSONField"
+    link: "https://docs.djangoproject.com/en/4.0/releases/4.0/"
+    auto_fixable: true
+    transform_name: import_jsonfield_postgres_to_models

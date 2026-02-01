@@ -1,0 +1,174 @@
+# FastAPI Deprecation Database
+# Patterns that are deprecated in FastAPI 0.100+
+
+library: fastapi
+display_name: FastAPI
+documentation_url: https://fastapi.tiangolo.com/release-notes/
+
+release_cycle:
+  typical_major_interval_months: 12
+  current_version: "0.109"
+  next_major_estimated: "2025-Q2"
+
+deprecations:
+  # Pydantic v2 related deprecations
+  - id: fastapi-field-regex
+    pattern: "Field(regex="
+    pattern_type: regex
+    deprecated_in: "0.100"
+    removed_in: "1.0"
+    severity: warning
+    message: "Field(regex=...) is deprecated with Pydantic v2, use Field(pattern=...)"
+    replacement: "Field(pattern=...)"
+    link: "https://fastapi.tiangolo.com/release-notes/#0100"
+    auto_fixable: true
+    transform_name: field_regex_to_pattern
+
+  - id: fastapi-body-regex
+    pattern: "Body(regex="
+    pattern_type: regex
+    deprecated_in: "0.100"
+    removed_in: "1.0"
+    severity: warning
+    message: "Body(regex=...) is deprecated, use Body(pattern=...)"
+    replacement: "Body(pattern=...)"
+    link: "https://fastapi.tiangolo.com/release-notes/#0100"
+    auto_fixable: true
+    transform_name: body_regex_to_pattern
+
+  - id: fastapi-query-regex
+    pattern: "Query(regex="
+    pattern_type: regex
+    deprecated_in: "0.100"
+    removed_in: "1.0"
+    severity: warning
+    message: "Query(regex=...) is deprecated, use Query(pattern=...)"
+    replacement: "Query(pattern=...)"
+    link: "https://fastapi.tiangolo.com/release-notes/#0100"
+    auto_fixable: true
+    transform_name: query_regex_to_pattern
+
+  - id: fastapi-path-regex
+    pattern: "Path(regex="
+    pattern_type: regex
+    deprecated_in: "0.100"
+    removed_in: "1.0"
+    severity: warning
+    message: "Path(regex=...) is deprecated, use Path(pattern=...)"
+    replacement: "Path(pattern=...)"
+    link: "https://fastapi.tiangolo.com/release-notes/#0100"
+    auto_fixable: true
+    transform_name: path_regex_to_pattern
+
+  # Starlette import deprecations
+  - id: fastapi-starlette-jsonresponse
+    pattern: "from starlette.responses import JSONResponse"
+    pattern_type: import
+    deprecated_in: "0.100"
+    removed_in: null
+    severity: info
+    message: "Import JSONResponse from fastapi.responses instead of starlette"
+    replacement: "from fastapi.responses import JSONResponse"
+    link: "https://fastapi.tiangolo.com/release-notes/"
+    auto_fixable: true
+    transform_name: starlette_to_fastapi_responses
+
+  - id: fastapi-starlette-request
+    pattern: "from starlette.requests import Request"
+    pattern_type: import
+    deprecated_in: "0.100"
+    removed_in: null
+    severity: info
+    message: "Import Request from fastapi instead of starlette"
+    replacement: "from fastapi import Request"
+    link: "https://fastapi.tiangolo.com/release-notes/"
+    auto_fixable: true
+    transform_name: starlette_to_fastapi_request
+
+  - id: fastapi-starlette-status
+    pattern: "from starlette.status import"
+    pattern_type: import
+    deprecated_in: "0.100"
+    removed_in: null
+    severity: info
+    message: "Import status from fastapi instead of starlette"
+    replacement: "from fastapi import status"
+    link: "https://fastapi.tiangolo.com/release-notes/"
+    auto_fixable: true
+    transform_name: starlette_to_fastapi_status
+
+  - id: fastapi-starlette-websocket
+    pattern: "from starlette.websockets import WebSocket"
+    pattern_type: import
+    deprecated_in: "0.100"
+    removed_in: null
+    severity: info
+    message: "Import WebSocket from fastapi instead of starlette"
+    replacement: "from fastapi import WebSocket"
+    link: "https://fastapi.tiangolo.com/release-notes/"
+    auto_fixable: true
+    transform_name: starlette_to_fastapi_websocket
+
+  # OpenAPI deprecations
+  - id: fastapi-openapi-prefix
+    pattern: "openapi_prefix="
+    pattern_type: regex
+    deprecated_in: "0.90"
+    removed_in: "0.100"
+    severity: critical
+    message: "openapi_prefix parameter is removed, use root_path instead"
+    replacement: "root_path='/api/v1'"
+    link: "https://fastapi.tiangolo.com/release-notes/"
+    auto_fixable: true
+    transform_name: openapi_prefix_to_root_path
+
+  # Dependency injection deprecations
+  - id: fastapi-depends-use-cache
+    pattern: "use_cache="
+    pattern_type: regex
+    context: "in Depends()"
+    deprecated_in: "0.95"
+    removed_in: "1.0"
+    severity: deprecated
+    message: "use_cache parameter is deprecated, use use_cached instead"
+    replacement: "Depends(use_cached=False)"
+    link: "https://fastapi.tiangolo.com/release-notes/"
+    auto_fixable: true
+    transform_name: depends_use_cache_rename
+
+  # Response class deprecations
+  - id: fastapi-starlette-htmlresponse
+    pattern: "from starlette.responses import HTMLResponse"
+    pattern_type: import
+    deprecated_in: "0.100"
+    removed_in: null
+    severity: info
+    message: "Import HTMLResponse from fastapi.responses instead of starlette"
+    replacement: "from fastapi.responses import HTMLResponse"
+    link: "https://fastapi.tiangolo.com/release-notes/"
+    auto_fixable: true
+    transform_name: starlette_to_fastapi_responses
+
+  - id: fastapi-starlette-redirectresponse
+    pattern: "from starlette.responses import RedirectResponse"
+    pattern_type: import
+    deprecated_in: "0.100"
+    removed_in: null
+    severity: info
+    message: "Import RedirectResponse from fastapi.responses instead of starlette"
+    replacement: "from fastapi.responses import RedirectResponse"
+    link: "https://fastapi.tiangolo.com/release-notes/"
+    auto_fixable: true
+    transform_name: starlette_to_fastapi_responses
+
+  - id: fastapi-starlette-streamingresponse
+    pattern: "from starlette.responses import StreamingResponse"
+    pattern_type: import
+    deprecated_in: "0.100"
+    removed_in: null
+    severity: info
+    message: "Import StreamingResponse from fastapi.responses instead of starlette"
+    replacement: "from fastapi.responses import StreamingResponse"
+    link: "https://fastapi.tiangolo.com/release-notes/"
+    auto_fixable: true
+    transform_name: starlette_to_fastapi_responses

@@ -1,0 +1,144 @@
+# Flask Deprecation Database
+# Patterns that are deprecated in Flask 2.x/3.x
+
+library: flask
+display_name: Flask
+documentation_url: https://flask.palletsprojects.com/en/latest/changes/
+
+release_cycle:
+  typical_major_interval_months: 24
+  current_version: "3.0"
+  next_major_estimated: null
+
+deprecations:
+  # JSON module deprecations
+  - id: flask-json-module
+    pattern: "from flask import json"
+    pattern_type: import
+    deprecated_in: "2.2"
+    removed_in: "3.0"
+    severity: warning
+    message: "flask.json module is deprecated, use standard json module"
+    replacement: "import json"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/#version-2-2-0"
+    auto_fixable: true
+    transform_name: flask_json_to_standard_json
+
+  - id: flask-json-jsonify-import
+    pattern: "flask.json.jsonify"
+    pattern_type: regex
+    deprecated_in: "2.2"
+    removed_in: null
+    severity: info
+    message: "Use jsonify directly from flask instead of flask.json.jsonify"
+    replacement: "from flask import jsonify"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/"
+    auto_fixable: true
+    transform_name: flask_json_jsonify_to_jsonify
+
+  # Escape function deprecation
+  - id: flask-markupsafe-escape
+    pattern: "from flask import escape"
+    pattern_type: import
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: critical
+    message: "escape() removed from flask, import from markupsafe instead"
+    replacement: "from markupsafe import escape"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/"
+    auto_fixable: true
+    transform_name: flask_escape_to_markupsafe
+
+  - id: flask-markupsafe-markup
+    pattern: "from flask import Markup"
+    pattern_type: import
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: critical
+    message: "Markup class removed from flask, import from markupsafe instead"
+    replacement: "from markupsafe import Markup"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/"
+    auto_fixable: true
+    transform_name: flask_markup_to_markupsafe
+
+  # Blueprint deprecations
+  - id: flask-blueprint-json-encoder
+    pattern: "bp.json_encoder"
+    pattern_type: attribute
+    deprecated_in: "2.2"
+    removed_in: "3.0"
+    severity: warning
+    message: "Blueprint.json_encoder is deprecated, use app.json provider"
+    replacement: "app.json = CustomJSONProvider(app)"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/"
+    auto_fixable: false
+
+  - id: flask-blueprint-json-decoder
+    pattern: "bp.json_decoder"
+    pattern_type: attribute
+    deprecated_in: "2.2"
+    removed_in: "3.0"
+    severity: warning
+    message: "Blueprint.json_decoder is deprecated, use app.json provider"
+    replacement: "app.json = CustomJSONProvider(app)"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/"
+    auto_fixable: false
+
+  # App json_encoder/decoder deprecations
+  - id: flask-app-json-encoder
+    pattern: "app.json_encoder"
+    pattern_type: attribute
+    deprecated_in: "2.2"
+    removed_in: "3.0"
+    severity: warning
+    message: "app.json_encoder is deprecated, use app.json provider"
+    replacement: "app.json = CustomJSONProvider(app)"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/"
+    auto_fixable: false
+
+  - id: flask-app-json-decoder
+    pattern: "app.json_decoder"
+    pattern_type: attribute
+    deprecated_in: "2.2"
+    removed_in: "3.0"
+    severity: warning
+    message: "app.json_decoder is deprecated, use app.json provider"
+    replacement: "app.json = CustomJSONProvider(app)"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/"
+    auto_fixable: false
+
+  # Request/Response json deprecations
+  - id: flask-request-get-json
+    pattern: ".get_json(force="
+    pattern_type: method_call
+    deprecated_in: "2.1"
+    removed_in: null
+    severity: info
+    message: "Consider using request.json property instead of get_json()"
+    replacement: "request.json"
+    link: "https://flask.palletsprojects.com/en/3.0.x/api/#flask.Request.json"
+    auto_fixable: false
+
+  # before_first_request deprecation
+  - id: flask-before-first-request
+    pattern: "@app.before_first_request"
+    pattern_type: decorator
+    deprecated_in: "2.2"
+    removed_in: "3.0"
+    severity: critical
+    message: "before_first_request is removed, use alternative patterns"
+    replacement: "Use record_once on blueprint or app startup patterns"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/"
+    auto_fixable: false
+
+  # JSONIFY_PRETTYPRINT_REGULAR config
+  - id: flask-jsonify-prettyprint
+    pattern: "JSONIFY_PRETTYPRINT_REGULAR"
+    pattern_type: regex
+    deprecated_in: "2.2"
+    removed_in: "3.0"
+    severity: deprecated
+    message: "JSONIFY_PRETTYPRINT_REGULAR is deprecated, use JSON_PROVIDER_CLASS"
+    replacement: "Subclass DefaultJSONProvider to customize JSON serialization"
+    link: "https://flask.palletsprojects.com/en/3.0.x/changes/"
+    auto_fixable: false

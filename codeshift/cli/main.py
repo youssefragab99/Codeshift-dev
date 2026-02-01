@@ -19,7 +19,6 @@ from codeshift.cli.commands.diff import diff
 from codeshift.cli.commands.scan import scan
 from codeshift.cli.commands.upgrade import upgrade
 from codeshift.cli.commands.upgrade_all import upgrade_all
-from codeshift.cli.commands.watch import watch
 
 console = Console()
 
@@ -51,7 +50,6 @@ cli.add_command(apply)
 
 # Deprecation Early Warning System commands
 cli.add_command(deprecations)
-cli.add_command(watch)
 
 # Auth commands
 cli.add_command(register)

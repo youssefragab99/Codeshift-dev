@@ -1,0 +1,123 @@
+# Click Deprecation Database
+# Patterns that are deprecated in Click 8.x
+
+library: click
+display_name: Click
+documentation_url: https://click.palletsprojects.com/en/latest/changes/
+
+release_cycle:
+  typical_major_interval_months: 24
+  current_version: "8.1"
+  next_major_estimated: null
+
+deprecations:
+  # Parameter declarations deprecations
+  - id: click-autoenvvar-prefix
+    pattern: "autoenvvar_prefix="
+    pattern_type: regex
+    deprecated_in: "8.0"
+    removed_in: null
+    severity: info
+    message: "Consider using auto_envvar_prefix (underscore) for consistency"
+    replacement: "auto_envvar_prefix='MYAPP'"
+    link: "https://click.palletsprojects.com/en/8.1.x/api/#click.Context"
+    auto_fixable: true
+    transform_name: autoenvvar_prefix_underscore
+
+  # resultcallback deprecation
+  - id: click-resultcallback
+    pattern: "@resultcallback"
+    pattern_type: decorator
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: deprecated
+    message: "resultcallback is deprecated, use result_callback"
+    replacement: "@group.result_callback()"
+    link: "https://click.palletsprojects.com/en/8.1.x/commands/#result-callbacks"
+    auto_fixable: true
+    transform_name: resultcallback_to_result_callback
+
+  # Import path changes
+  - id: click-utils-import
+    pattern: "from click.utils import"
+    pattern_type: import
+    deprecated_in: "8.0"
+    removed_in: null
+    severity: info
+    message: "Import directly from click module when possible"
+    replacement: "from click import echo, style, etc."
+    link: "https://click.palletsprojects.com/en/8.1.x/"
+    auto_fixable: false
+
+  # Echo file parameter
+  - id: click-echo-file
+    pattern: "echo(file="
+    pattern_type: method_call
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: info
+    message: "Consider using err=True for stderr output instead of file=sys.stderr"
+    replacement: "click.echo('message', err=True)"
+    link: "https://click.palletsprojects.com/en/8.1.x/api/#click.echo"
+    auto_fixable: false
+
+  # get_terminal_size deprecation
+  - id: click-get-terminal-size
+    pattern: "get_terminal_size("
+    pattern_type: method_call
+    deprecated_in: "8.0"
+    removed_in: null
+    severity: deprecated
+    message: "click.get_terminal_size() is deprecated, use shutil.get_terminal_size()"
+    replacement: "shutil.get_terminal_size()"
+    link: "https://click.palletsprojects.com/en/8.1.x/changes/#version-8-0-0"
+    auto_fixable: true
+    transform_name: click_terminal_size_to_shutil
+
+  # Path type exists parameter
+  - id: click-path-exists
+    pattern: "Path(exists="
+    pattern_type: method_call
+    deprecated_in: "8.0"
+    removed_in: null
+    severity: info
+    message: "Consider using path_type parameter for pathlib.Path return type"
+    replacement: "click.Path(exists=True, path_type=pathlib.Path)"
+    link: "https://click.palletsprojects.com/en/8.1.x/api/#click.Path"
+    auto_fixable: false
+
+  # Hidden option
+  - id: click-option-hidden
+    pattern: "@option(hidden="
+    pattern_type: decorator
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: info
+    message: "Ensure hidden options have help text for documentation purposes"
+    replacement: "@click.option('--debug', hidden=True, help='Enable debug mode')"
+    link: "https://click.palletsprojects.com/en/8.1.x/options/#boolean-flags"
+    auto_fixable: false
+
+  # Deprecated testing imports
+  - id: click-testing-import
+    pattern: "from click.testing import CliRunner"
+    pattern_type: import
+    deprecated_in: "8.0"
+    removed_in: null
+    severity: info
+    message: "CliRunner now supports mix_stderr parameter for better output control"
+    replacement: "from click.testing import CliRunner; runner = CliRunner(mix_stderr=False)"
+    link: "https://click.palletsprojects.com/en/8.1.x/testing/"
+    auto_fixable: false
+
+  # Style blink parameter
+  - id: click-style-blink
+    pattern: "style(blink="
+    pattern_type: method_call
+    deprecated_in: "8.0"
+    removed_in: null
+    severity: info
+    message: "blink may not be supported on all terminals"
+    replacement: "Consider alternative visual indicators"
+    link: "https://click.palletsprojects.com/en/8.1.x/utils/#ansi-colors"
+    auto_fixable: false

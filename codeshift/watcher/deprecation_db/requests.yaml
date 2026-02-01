@@ -1,0 +1,111 @@
+# Requests Deprecation Database
+# Patterns that are deprecated in Requests 2.x/3.x
+
+library: requests
+display_name: Requests
+documentation_url: https://requests.readthedocs.io/en/latest/
+
+release_cycle:
+  typical_major_interval_months: 36
+  current_version: "2.31"
+  next_major_estimated: null
+
+deprecations:
+  # Encoding deprecations
+  - id: requests-chardet-encoding
+    pattern: "response.apparent_encoding"
+    pattern_type: attribute
+    deprecated_in: "2.25"
+    removed_in: null
+    severity: info
+    message: "apparent_encoding may give inconsistent results, specify encoding explicitly"
+    replacement: "response.encoding = 'utf-8' or check Content-Type header"
+    link: "https://requests.readthedocs.io/en/latest/"
+    auto_fixable: false
+
+  # Session auth deprecations
+  - id: requests-auth-tuple
+    pattern: ".auth = ("
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: info
+    message: "Using tuple for auth is deprecated, use HTTPBasicAuth explicitly"
+    replacement: "session.auth = HTTPBasicAuth(username, password)"
+    link: "https://requests.readthedocs.io/en/latest/user/authentication/"
+    auto_fixable: true
+    transform_name: auth_tuple_to_httpbasicauth
+
+  # urllib3 warning patterns
+  - id: requests-insecure-request-warning
+    pattern: "urllib3.disable_warnings()"
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: warning
+    message: "Disabling SSL warnings is discouraged, fix SSL configuration instead"
+    replacement: "Configure SSL properly or use verify parameter appropriately"
+    link: "https://requests.readthedocs.io/en/latest/user/advanced/#ssl-cert-verification"
+    auto_fixable: false
+
+  # verify=False warning
+  - id: requests-verify-false
+    pattern: "verify=False"
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: warning
+    message: "verify=False disables SSL verification, this is a security risk"
+    replacement: "Use verify=True with proper certificate or verify='/path/to/cert'"
+    link: "https://requests.readthedocs.io/en/latest/user/advanced/#ssl-cert-verification"
+    auto_fixable: false
+
+  # Stream deprecations
+  - id: requests-iter-lines-keepends
+    pattern: ".iter_lines(keep_ends="
+    pattern_type: method_call
+    deprecated_in: "2.19"
+    removed_in: null
+    severity: deprecated
+    message: "keep_ends parameter is deprecated, line endings are now always stripped"
+    replacement: "Use .iter_lines() without keep_ends parameter"
+    link: "https://requests.readthedocs.io/en/latest/"
+    auto_fixable: true
+    transform_name: iter_lines_remove_keepends
+
+  # Content-Type handling
+  - id: requests-files-content-type
+    pattern: "files={"
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: info
+    message: "Consider using explicit content-type for file uploads"
+    replacement: "files={'file': ('filename', file_obj, 'content/type')}"
+    link: "https://requests.readthedocs.io/en/latest/user/quickstart/#post-a-multipart-encoded-file"
+    auto_fixable: false
+
+  # Timeout deprecations
+  - id: requests-no-timeout
+    pattern: ".get("
+    pattern_type: method_call
+    context: "without timeout parameter"
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: info
+    message: "Consider specifying timeout to prevent hanging requests"
+    replacement: "requests.get(url, timeout=30)"
+    link: "https://requests.readthedocs.io/en/latest/user/advanced/#timeouts"
+    auto_fixable: false
+
+  # Proxies deprecation pattern
+  - id: requests-proxy-env
+    pattern: "trust_env=True"
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: info
+    message: "trust_env may cause issues in some environments, consider explicit proxy config"
+    replacement: "Set proxies parameter explicitly"
+    link: "https://requests.readthedocs.io/en/latest/user/advanced/#proxies"
+    auto_fixable: false

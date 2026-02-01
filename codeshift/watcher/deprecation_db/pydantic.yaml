@@ -1,0 +1,297 @@
+# Pydantic Deprecation Database
+# Patterns that are deprecated in Pydantic v2
+
+library: pydantic
+display_name: Pydantic
+documentation_url: https://docs.pydantic.dev/latest/migration/
+
+release_cycle:
+  typical_major_interval_months: 24
+  current_version: "2.5"
+  next_major_estimated: "2026-Q1"
+
+deprecations:
+  # Config class deprecation
+  - id: pydantic-inner-config
+    pattern: "class Config:"
+    pattern_type: class_definition
+    context: "inside BaseModel subclass"
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: warning
+    message: "Inner Config class is deprecated, use model_config = ConfigDict(...)"
+    replacement: "model_config = ConfigDict(strict=True, ...)"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-config"
+    auto_fixable: true
+    transform_name: config_to_configdict
+
+  # Validator decorators
+  - id: pydantic-validator-decorator
+    pattern: "@validator"
+    pattern_type: decorator
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "@validator is deprecated, use @field_validator instead"
+    replacement: "@field_validator('field_name', mode='before')"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-validators"
+    auto_fixable: true
+    transform_name: validator_to_field_validator
+
+  - id: pydantic-root-validator
+    pattern: "@root_validator"
+    pattern_type: decorator
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "@root_validator is deprecated, use @model_validator instead"
+    replacement: "@model_validator(mode='before')"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-validators"
+    auto_fixable: true
+    transform_name: root_validator_to_model_validator
+
+  # Method deprecations
+  - id: pydantic-dict-method
+    pattern: ".dict("
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: deprecated
+    message: ".dict() is deprecated, use .model_dump() instead"
+    replacement: "instance.model_dump()"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-methods"
+    auto_fixable: true
+    transform_name: dict_to_model_dump
+
+  - id: pydantic-json-method
+    pattern: ".json("
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: deprecated
+    message: ".json() is deprecated, use .model_dump_json() instead"
+    replacement: "instance.model_dump_json()"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-methods"
+    auto_fixable: true
+    transform_name: json_to_model_dump_json
+
+  - id: pydantic-schema-method
+    pattern: ".schema("
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: info
+    message: ".schema() is deprecated, use .model_json_schema() instead"
+    replacement: "Model.model_json_schema()"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-methods"
+    auto_fixable: true
+    transform_name: schema_to_model_json_schema
+
+  - id: pydantic-schema-json-method
+    pattern: ".schema_json("
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: info
+    message: ".schema_json() is deprecated, use json.dumps(.model_json_schema()) instead"
+    replacement: "json.dumps(Model.model_json_schema())"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-methods"
+    auto_fixable: true
+    transform_name: schema_json_to_model_json_schema
+
+  - id: pydantic-parse-obj
+    pattern: ".parse_obj("
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: ".parse_obj() is deprecated, use .model_validate() instead"
+    replacement: "Model.model_validate(data)"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-methods"
+    auto_fixable: true
+    transform_name: parse_obj_to_model_validate
+
+  - id: pydantic-parse-raw
+    pattern: ".parse_raw("
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: ".parse_raw() is deprecated, use .model_validate_json() instead"
+    replacement: "Model.model_validate_json(data)"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-methods"
+    auto_fixable: true
+    transform_name: parse_raw_to_model_validate_json
+
+  - id: pydantic-parse-file
+    pattern: ".parse_file("
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: ".parse_file() is removed, use Path.read_text() with model_validate_json()"
+    replacement: "Model.model_validate_json(Path(file).read_text())"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-methods"
+    auto_fixable: false
+
+  - id: pydantic-copy-method
+    pattern: ".copy("
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: deprecated
+    message: ".copy() is deprecated, use .model_copy() instead"
+    replacement: "instance.model_copy()"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-methods"
+    auto_fixable: true
+    transform_name: copy_to_model_copy
+
+  - id: pydantic-update-forward-refs
+    pattern: "update_forward_refs("
+    pattern_type: method_call
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: deprecated
+    message: "update_forward_refs() is deprecated, use model_rebuild() instead"
+    replacement: "Model.model_rebuild()"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-methods"
+    auto_fixable: true
+    transform_name: update_forward_refs_to_model_rebuild
+
+  # Field parameter deprecations
+  - id: pydantic-field-regex
+    pattern: "Field(regex="
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "Field(regex=...) is deprecated, use Field(pattern=...) instead"
+    replacement: "Field(pattern=...)"
+    link: "https://docs.pydantic.dev/latest/migration/#field-function"
+    auto_fixable: true
+    transform_name: field_regex_to_pattern
+
+  - id: pydantic-field-const
+    pattern: "Field(const="
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "Field(const=...) is removed, use Literal type instead"
+    replacement: "field: Literal[value]"
+    link: "https://docs.pydantic.dev/latest/migration/#field-function"
+    auto_fixable: false
+
+  - id: pydantic-field-min-items
+    pattern: "Field(min_items="
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: info
+    message: "Field(min_items=...) is deprecated, use Field(min_length=...) instead"
+    replacement: "Field(min_length=...)"
+    link: "https://docs.pydantic.dev/latest/migration/#field-function"
+    auto_fixable: true
+    transform_name: field_min_items_to_min_length
+
+  - id: pydantic-field-max-items
+    pattern: "Field(max_items="
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: info
+    message: "Field(max_items=...) is deprecated, use Field(max_length=...) instead"
+    replacement: "Field(max_length=...)"
+    link: "https://docs.pydantic.dev/latest/migration/#field-function"
+    auto_fixable: true
+    transform_name: field_max_items_to_max_length
+
+  # Attribute deprecations
+  - id: pydantic-dunder-fields
+    pattern: "__fields__"
+    pattern_type: attribute
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: deprecated
+    message: "__fields__ is deprecated, use model_fields instead"
+    replacement: "Model.model_fields"
+    link: "https://docs.pydantic.dev/latest/migration/#attribute-names"
+    auto_fixable: true
+    transform_name: dunder_fields_to_model_fields
+
+  - id: pydantic-dunder-validators
+    pattern: "__validators__"
+    pattern_type: attribute
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: info
+    message: "__validators__ is deprecated, use __pydantic_decorators__ instead"
+    replacement: "Model.__pydantic_decorators__"
+    link: "https://docs.pydantic.dev/latest/migration/#attribute-names"
+    auto_fixable: true
+    transform_name: dunder_validators_rename
+
+  # Import deprecations
+  - id: pydantic-import-validator
+    pattern: "from pydantic import validator"
+    pattern_type: import
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "validator import is deprecated, use field_validator instead"
+    replacement: "from pydantic import field_validator"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-validators"
+    auto_fixable: true
+    transform_name: import_validator_to_field_validator
+
+  - id: pydantic-import-root-validator
+    pattern: "from pydantic import root_validator"
+    pattern_type: import
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "root_validator import is deprecated, use model_validator instead"
+    replacement: "from pydantic import model_validator"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-validators"
+    auto_fixable: true
+    transform_name: import_root_validator_to_model_validator
+
+  # Config options
+  - id: pydantic-config-orm-mode
+    pattern: "orm_mode"
+    pattern_type: regex
+    context: "inside Config class or ConfigDict"
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "orm_mode is deprecated, use from_attributes instead"
+    replacement: "from_attributes = True"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-config"
+    auto_fixable: true
+    transform_name: orm_mode_to_from_attributes
+
+  - id: pydantic-config-allow-mutation
+    pattern: "allow_mutation"
+    pattern_type: regex
+    context: "inside Config class"
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: warning
+    message: "allow_mutation=False is deprecated, use frozen=True instead"
+    replacement: "frozen = True"
+    link: "https://docs.pydantic.dev/latest/migration/#changes-to-config"
+    auto_fixable: true
+    transform_name: allow_mutation_to_frozen
+
+  # GenericModel
+  - id: pydantic-generic-model
+    pattern: "GenericModel"
+    pattern_type: import
+    deprecated_in: "2.0"
+    removed_in: "3.0"
+    severity: critical
+    message: "GenericModel is removed, BaseModel now supports generics directly"
+    replacement: "class MyModel(BaseModel, Generic[T]): ..."
+    link: "https://docs.pydantic.dev/latest/migration/#genericmodel"
+    auto_fixable: true
+    transform_name: generic_model_to_basemodel

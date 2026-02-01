@@ -1,0 +1,155 @@
+# attrs Deprecation Database
+# Patterns that are deprecated in attrs
+
+library: attrs
+display_name: attrs
+documentation_url: https://www.attrs.org/en/stable/changelog.html
+
+release_cycle:
+  typical_major_interval_months: 12
+  current_version: "23.2"
+  next_major_estimated: null
+
+deprecations:
+  # Old-style imports
+  - id: attrs-import-attr
+    pattern: "import attr"
+    pattern_type: import
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: info
+    message: "Consider using 'import attrs' for the newer API"
+    replacement: "import attrs"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: false
+
+  # @attr.s decorator deprecation
+  - id: attrs-attr-s-decorator
+    pattern: "@attr.s"
+    pattern_type: decorator
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: deprecated
+    message: "@attr.s is deprecated, use @attrs.define instead"
+    replacement: "@attrs.define"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: true
+    transform_name: attr_s_to_define
+
+  # @attr.attrs decorator deprecation
+  - id: attrs-attr-attrs-decorator
+    pattern: "@attr.attrs"
+    pattern_type: decorator
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: deprecated
+    message: "@attr.attrs is deprecated, use @attrs.define instead"
+    replacement: "@attrs.define"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: true
+    transform_name: attr_attrs_to_define
+
+  # attr.ib deprecation
+  - id: attrs-attr-ib
+    pattern: "attr.ib("
+    pattern_type: method_call
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: deprecated
+    message: "attr.ib() is deprecated, use attrs.field() instead"
+    replacement: "attrs.field()"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: true
+    transform_name: attr_ib_to_field
+
+  # attr.attrib deprecation
+  - id: attrs-attr-attrib
+    pattern: "attr.attrib("
+    pattern_type: method_call
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: deprecated
+    message: "attr.attrib() is deprecated, use attrs.field() instead"
+    replacement: "attrs.field()"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: true
+    transform_name: attr_attrib_to_field
+
+  # @attr.dataclass deprecation info
+  - id: attrs-attr-dataclass
+    pattern: "@attr.dataclass"
+    pattern_type: decorator
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: info
+    message: "Consider using @attrs.define for full attrs features"
+    replacement: "@attrs.define"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: true
+    transform_name: attr_dataclass_to_define
+
+  # Factory deprecation
+  - id: attrs-factory-deprecated
+    pattern: "attr.Factory("
+    pattern_type: method_call
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: deprecated
+    message: "attr.Factory() is deprecated, use attrs.Factory() instead"
+    replacement: "attrs.Factory()"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: true
+    transform_name: attr_factory_to_attrs_factory
+
+  # Validators import
+  - id: attrs-validators-import
+    pattern: "from attr import validators"
+    pattern_type: import
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: deprecated
+    message: "Import validators from attrs instead"
+    replacement: "from attrs import validators"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: true
+    transform_name: attr_validators_import
+
+  # Converters import
+  - id: attrs-converters-import
+    pattern: "from attr import converters"
+    pattern_type: import
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: deprecated
+    message: "Import converters from attrs instead"
+    replacement: "from attrs import converters"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: true
+    transform_name: attr_converters_import
+
+  # cmp parameter deprecation
+  - id: attrs-cmp-parameter
+    pattern: "cmp="
+    pattern_type: regex
+    context: "in @attr.s or attrs.define"
+    deprecated_in: "19.2"
+    removed_in: "21.1"
+    severity: critical
+    message: "cmp parameter is removed, use eq and order parameters"
+    replacement: "eq=True, order=True"
+    link: "https://www.attrs.org/en/stable/changelog.html"
+    auto_fixable: true
+    transform_name: cmp_to_eq_order
+
+  # make_class deprecation
+  - id: attrs-make-class
+    pattern: "attr.make_class("
+    pattern_type: method_call
+    deprecated_in: "21.3"
+    removed_in: null
+    severity: deprecated
+    message: "attr.make_class() is deprecated, use attrs.make_class()"
+    replacement: "attrs.make_class()"
+    link: "https://www.attrs.org/en/stable/names.html"
+    auto_fixable: true
+    transform_name: attr_make_class_to_attrs

@@ -1,0 +1,115 @@
+# HTTPX Deprecation Database
+# Patterns that are deprecated in HTTPX
+
+library: httpx
+display_name: HTTPX
+documentation_url: https://www.python-httpx.org/
+
+release_cycle:
+  typical_major_interval_months: 12
+  current_version: "0.27"
+  next_major_estimated: "2025-Q2"
+
+deprecations:
+  # Timeout deprecations
+  - id: httpx-timeout-tuple
+    pattern: "timeout=("
+    pattern_type: regex
+    deprecated_in: "0.20"
+    removed_in: "1.0"
+    severity: warning
+    message: "Timeout tuple is deprecated, use Timeout object instead"
+    replacement: "timeout=httpx.Timeout(connect=5.0, read=10.0)"
+    link: "https://www.python-httpx.org/advanced/#fine-tuning-the-configuration"
+    auto_fixable: true
+    transform_name: timeout_tuple_to_object
+
+  # Proxies deprecations
+  - id: httpx-proxies-dict
+    pattern: "proxies={"
+    pattern_type: regex
+    deprecated_in: "0.23"
+    removed_in: "1.0"
+    severity: warning
+    message: "proxies dict is deprecated, use proxy parameter instead"
+    replacement: "proxy='http://proxy.example.com'"
+    link: "https://www.python-httpx.org/advanced/#http-proxying"
+    auto_fixable: true
+    transform_name: proxies_dict_to_proxy
+
+  # Auth deprecations
+  - id: httpx-auth-tuple
+    pattern: "auth=("
+    pattern_type: regex
+    deprecated_in: "0.18"
+    removed_in: null
+    severity: info
+    message: "Consider using BasicAuth for clearer code"
+    replacement: "auth=httpx.BasicAuth(username, password)"
+    link: "https://www.python-httpx.org/advanced/#authentication"
+    auto_fixable: true
+    transform_name: auth_tuple_to_basicauth
+
+  # Response content deprecations
+  - id: httpx-response-read
+    pattern: ".read()"
+    pattern_type: method_call
+    context: "on Response object"
+    deprecated_in: "0.20"
+    removed_in: null
+    severity: info
+    message: "Use .content property instead of .read() for sync responses"
+    replacement: "response.content"
+    link: "https://www.python-httpx.org/quickstart/"
+    auto_fixable: true
+    transform_name: response_read_to_content
+
+  # Client configuration deprecations
+  - id: httpx-pool-limits
+    pattern: "pool_limits="
+    pattern_type: regex
+    deprecated_in: "0.18"
+    removed_in: "0.20"
+    severity: critical
+    message: "pool_limits is removed, use limits parameter instead"
+    replacement: "limits=httpx.Limits(max_keepalive_connections=20)"
+    link: "https://www.python-httpx.org/advanced/#pool-limit-configuration"
+    auto_fixable: true
+    transform_name: pool_limits_to_limits
+
+  # Dispatch deprecations
+  - id: httpx-dispatch
+    pattern: "dispatch="
+    pattern_type: regex
+    deprecated_in: "0.18"
+    removed_in: "0.20"
+    severity: critical
+    message: "dispatch parameter is removed, use transport instead"
+    replacement: "transport=httpx.HTTPTransport()"
+    link: "https://www.python-httpx.org/advanced/#custom-transports"
+    auto_fixable: true
+    transform_name: dispatch_to_transport
+
+  # Trust env deprecation
+  - id: httpx-trust-env-false
+    pattern: "trust_env=False"
+    pattern_type: regex
+    deprecated_in: "0.23"
+    removed_in: null
+    severity: info
+    message: "trust_env default changed, explicitly set if needed"
+    replacement: "Be explicit about environment variable usage"
+    link: "https://www.python-httpx.org/"
+    auto_fixable: false
+
+  # Async context manager pattern
+  - id: httpx-async-client-without-context
+    pattern: "AsyncClient()"
+    pattern_type: method_call
+    deprecated_in: "0.20"
+    removed_in: null
+    severity: deprecated
+    message: "AsyncClient should be used as context manager for proper cleanup"
+    replacement: "async with httpx.AsyncClient() as client:"
+    link: "https://www.python-httpx.org/async/"
+    auto_fixable: false

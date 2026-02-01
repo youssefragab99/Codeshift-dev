@@ -1,0 +1,156 @@
+# Pytest Deprecation Database
+# Patterns that are deprecated in Pytest 7.x/8.x
+
+library: pytest
+display_name: pytest
+documentation_url: https://docs.pytest.org/en/stable/changelog.html
+
+release_cycle:
+  typical_major_interval_months: 12
+  current_version: "8.0"
+  next_major_estimated: null
+
+deprecations:
+  # py.path deprecations
+  - id: pytest-py-path
+    pattern: "py.path.local"
+    pattern_type: regex
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: warning
+    message: "py.path.local is deprecated, use pathlib.Path instead"
+    replacement: "pathlib.Path"
+    link: "https://docs.pytest.org/en/stable/changelog.html#pytest-7-0-0"
+    auto_fixable: true
+    transform_name: py_path_to_pathlib
+
+  # tmpdir fixture deprecation
+  - id: pytest-tmpdir-fixture
+    pattern: "tmpdir"
+    pattern_type: regex
+    context: "as fixture parameter"
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: deprecated
+    message: "tmpdir fixture is deprecated, use tmp_path instead"
+    replacement: "tmp_path (returns pathlib.Path)"
+    link: "https://docs.pytest.org/en/stable/how-to/tmp_path.html"
+    auto_fixable: true
+    transform_name: tmpdir_to_tmp_path
+
+  # tmpdir_factory deprecation
+  - id: pytest-tmpdir-factory
+    pattern: "tmpdir_factory"
+    pattern_type: regex
+    context: "as fixture parameter"
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: deprecated
+    message: "tmpdir_factory is deprecated, use tmp_path_factory instead"
+    replacement: "tmp_path_factory (returns pathlib.Path)"
+    link: "https://docs.pytest.org/en/stable/how-to/tmp_path.html"
+    auto_fixable: true
+    transform_name: tmpdir_factory_to_tmp_path_factory
+
+  # Record property deprecation
+  - id: pytest-record-xml-property
+    pattern: "record_xml_property"
+    pattern_type: regex
+    deprecated_in: "6.0"
+    removed_in: null
+    severity: deprecated
+    message: "record_xml_property is deprecated, use record_property"
+    replacement: "record_property"
+    link: "https://docs.pytest.org/en/stable/how-to/output.html#record-property"
+    auto_fixable: true
+    transform_name: record_xml_property_to_record_property
+
+  # Nose compatibility deprecations
+  - id: pytest-nose-setup
+    pattern: "def setup("
+    pattern_type: regex
+    context: "module level setup function"
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: warning
+    message: "Nose-style setup is deprecated, use pytest fixtures"
+    replacement: "@pytest.fixture(autouse=True)"
+    link: "https://docs.pytest.org/en/stable/how-to/xunit_setup.html"
+    auto_fixable: false
+
+  - id: pytest-nose-teardown
+    pattern: "def teardown("
+    pattern_type: regex
+    context: "module level teardown function"
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: warning
+    message: "Nose-style teardown is deprecated, use pytest fixtures with yield"
+    replacement: "@pytest.fixture(autouse=True) with yield"
+    link: "https://docs.pytest.org/en/stable/how-to/xunit_setup.html"
+    auto_fixable: false
+
+  # yield_fixture deprecation
+  - id: pytest-yield-fixture
+    pattern: "@pytest.yield_fixture"
+    pattern_type: decorator
+    deprecated_in: "6.0"
+    removed_in: "8.0"
+    severity: critical
+    message: "@pytest.yield_fixture is removed, use @pytest.fixture"
+    replacement: "@pytest.fixture"
+    link: "https://docs.pytest.org/en/stable/how-to/fixtures.html"
+    auto_fixable: true
+    transform_name: yield_fixture_to_fixture
+
+  # Mark.parametrize indirect deprecation
+  - id: pytest-indirect-bool
+    pattern: "indirect=True"
+    pattern_type: regex
+    context: "in parametrize decorator"
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: info
+    message: "Consider using indirect=['param_name'] for explicit parameter selection"
+    replacement: "indirect=['fixture_name']"
+    link: "https://docs.pytest.org/en/stable/example/parametrize.html#indirect-parametrization"
+    auto_fixable: false
+
+  # Config addopts deprecation pattern
+  - id: pytest-addopts-config
+    pattern: "addopts ="
+    pattern_type: regex
+    context: "in setup.cfg or tox.ini"
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: info
+    message: "Consider using pyproject.toml for pytest configuration"
+    replacement: "[tool.pytest.ini_options] in pyproject.toml"
+    link: "https://docs.pytest.org/en/stable/reference/customize.html"
+    auto_fixable: false
+
+  # pytest_plugins in conftest warning
+  - id: pytest-pytest-plugins
+    pattern: "pytest_plugins ="
+    pattern_type: regex
+    context: "in non-top-level conftest.py"
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: warning
+    message: "pytest_plugins should only be defined in top-level conftest.py"
+    replacement: "Move pytest_plugins to top-level conftest.py"
+    link: "https://docs.pytest.org/en/stable/how-to/plugins.html"
+    auto_fixable: false
+
+  # Fspath attribute deprecation
+  - id: pytest-fspath
+    pattern: ".fspath"
+    pattern_type: attribute
+    deprecated_in: "7.0"
+    removed_in: null
+    severity: deprecated
+    message: "fspath attribute is deprecated, use path instead"
+    replacement: "item.path (returns pathlib.Path)"
+    link: "https://docs.pytest.org/en/stable/changelog.html#pytest-7-0-0"
+    auto_fixable: true
+    transform_name: fspath_to_path

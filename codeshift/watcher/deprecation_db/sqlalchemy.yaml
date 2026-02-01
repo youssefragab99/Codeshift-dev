@@ -1,0 +1,240 @@
+# SQLAlchemy Deprecation Database
+# Patterns that are deprecated in SQLAlchemy 2.0
+
+library: sqlalchemy
+display_name: SQLAlchemy
+documentation_url: https://docs.sqlalchemy.org/en/20/changelog/migration_20.html
+
+release_cycle:
+  typical_major_interval_months: 36
+  current_version: "2.0"
+  next_major_estimated: null
+
+deprecations:
+  # Query API deprecations - most significant
+  - id: sqlalchemy-session-query
+    pattern: "session.query("
+    pattern_type: method_call
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: critical
+    message: "session.query() is deprecated, use select() statements instead"
+    replacement: "session.execute(select(Model))"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html#migration-orm-usage"
+    auto_fixable: true
+    transform_name: query_to_select
+
+  - id: sqlalchemy-query-filter
+    pattern: ".filter("
+    pattern_type: method_call
+    context: "on Query object"
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: warning
+    message: "Query.filter() is deprecated, use select().where() instead"
+    replacement: "select(Model).where(condition)"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: filter_to_where
+
+  - id: sqlalchemy-query-filter-by
+    pattern: ".filter_by("
+    pattern_type: method_call
+    context: "on Query object"
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: warning
+    message: "Query.filter_by() is deprecated, use select().where() instead"
+    replacement: "select(Model).where(Model.column == value)"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: filter_by_to_where
+
+  - id: sqlalchemy-query-all
+    pattern: ".all()"
+    pattern_type: method_call
+    context: "on Query object"
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: warning
+    message: "Query.all() is deprecated, use scalars().all() instead"
+    replacement: "session.execute(select(Model)).scalars().all()"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: query_all_to_scalars_all
+
+  - id: sqlalchemy-query-first
+    pattern: ".first()"
+    pattern_type: method_call
+    context: "on Query object"
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: warning
+    message: "Query.first() is deprecated, use scalars().first() instead"
+    replacement: "session.execute(select(Model)).scalars().first()"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: query_first_to_scalars_first
+
+  - id: sqlalchemy-query-one
+    pattern: ".one()"
+    pattern_type: method_call
+    context: "on Query object"
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: warning
+    message: "Query.one() is deprecated, use scalars().one() instead"
+    replacement: "session.execute(select(Model)).scalars().one()"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: query_one_to_scalars_one
+
+  - id: sqlalchemy-query-get
+    pattern: ".get("
+    pattern_type: method_call
+    context: "on Query object"
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: warning
+    message: "Query.get(pk) is deprecated, use Session.get() instead"
+    replacement: "session.get(Model, pk)"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: query_get_to_session_get
+
+  - id: sqlalchemy-query-count
+    pattern: ".count()"
+    pattern_type: method_call
+    context: "on Query object"
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: deprecated
+    message: "Query.count() is deprecated, use func.count() with select instead"
+    replacement: "session.execute(select(func.count()).select_from(Model)).scalar()"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: query_count_to_func_count
+
+  # Engine deprecations
+  - id: sqlalchemy-engine-execute
+    pattern: "engine.execute("
+    pattern_type: method_call
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: critical
+    message: "engine.execute() is removed, use engine.connect() context manager"
+    replacement: "with engine.connect() as conn: conn.execute()"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html#execute"
+    auto_fixable: false
+
+  - id: sqlalchemy-string-execute
+    pattern: 'execute("'
+    pattern_type: regex
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: critical
+    message: "Raw string execution is removed, use text() wrapper"
+    replacement: "connection.execute(text('SQL string'))"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: string_execute_to_text
+
+  # Declarative deprecations
+  - id: sqlalchemy-declarative-base-func
+    pattern: "declarative_base()"
+    pattern_type: method_call
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: critical
+    message: "declarative_base() is deprecated, use DeclarativeBase class instead"
+    replacement: "class Base(DeclarativeBase): pass"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html#declarative"
+    auto_fixable: true
+    transform_name: declarative_base_to_class
+
+  - id: sqlalchemy-declarative-base-import
+    pattern: "from sqlalchemy.ext.declarative import declarative_base"
+    pattern_type: import
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: warning
+    message: "Import DeclarativeBase from sqlalchemy.orm instead"
+    replacement: "from sqlalchemy.orm import DeclarativeBase"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: import_declarative_base
+
+  # Column deprecations
+  - id: sqlalchemy-column-in-orm
+    pattern: "Column("
+    pattern_type: method_call
+    context: "in ORM model definition"
+    deprecated_in: "1.4"
+    removed_in: null
+    severity: deprecated
+    message: "Column() is deprecated for ORM models, use mapped_column() instead"
+    replacement: "mapped_column()"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html#column-mapped-column"
+    auto_fixable: true
+    transform_name: column_to_mapped_column
+
+  - id: sqlalchemy-backref
+    pattern: "backref="
+    pattern_type: regex
+    context: "in relationship()"
+    deprecated_in: "1.4"
+    removed_in: null
+    severity: deprecated
+    message: "backref parameter is deprecated, use back_populates on both sides"
+    replacement: "relationship(back_populates='...')"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: false
+
+  - id: sqlalchemy-backref-import
+    pattern: "from sqlalchemy.orm import backref"
+    pattern_type: import
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: info
+    message: "backref function is deprecated, use back_populates instead"
+    replacement: "Use back_populates parameter in relationship()"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: remove_backref_import
+
+  # Session deprecations
+  - id: sqlalchemy-session-autocommit
+    pattern: "autocommit=True"
+    pattern_type: regex
+    context: "in Session or sessionmaker"
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: critical
+    message: "autocommit mode is removed from Session"
+    replacement: "Use explicit transaction management with connection.begin()"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html#session-autocommit"
+    auto_fixable: false
+
+  - id: sqlalchemy-session-subtransactions
+    pattern: "subtransactions="
+    pattern_type: regex
+    deprecated_in: "1.4"
+    removed_in: "2.0"
+    severity: warning
+    message: "subtransactions parameter is removed"
+    replacement: "Use Session.begin_nested() for savepoints"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: false
+
+  # Future flag (informational)
+  - id: sqlalchemy-future-flag
+    pattern: "future=True"
+    pattern_type: regex
+    deprecated_in: "2.0"
+    removed_in: null
+    severity: info
+    message: "future=True is no longer needed in SQLAlchemy 2.0"
+    replacement: "Remove future=True parameter"
+    link: "https://docs.sqlalchemy.org/en/20/changelog/migration_20.html"
+    auto_fixable: true
+    transform_name: remove_future_flag

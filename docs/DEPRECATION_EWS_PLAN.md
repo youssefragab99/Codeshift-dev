@@ -44,7 +44,8 @@ from enum import Enum
 
 class DeprecationSeverity(Enum):
     INFO = "info"           # Soft deprecation, alternative available
-    WARNING = "warning"     # Deprecated, removal planned
+    DEPRECATED = "deprecated"  # Officially deprecated, removal not yet scheduled
+    WARNING = "warning"     # Deprecated, removal planned in future version
     CRITICAL = "critical"   # Removal imminent or already in next major version
 ```
 
@@ -124,6 +125,12 @@ class DeprecationScanResult:
 library: pydantic
 display_name: Pydantic
 documentation_url: https://docs.pydantic.dev/latest/migration/
+
+# Release cycle metadata for timeline estimation
+release_cycle:
+  typical_major_interval_months: 24    # ~2 years between major versions
+  current_version: "2.5"
+  next_major_estimated: "2025-Q4"      # Optional: known roadmap info
 
 deprecations:
   # Pattern-based matching
@@ -328,8 +335,10 @@ class DeprecationScanner:
               default="all", help="Filter by severity")
 @click.option("--json", "output_json", is_flag=True,
               help="Output as JSON for CI integration")
-@click.option("--fail-on", type=click.Choice(["critical", "warning", "info"]),
+@click.option("--fail-on", type=click.Choice(["critical", "warning", "deprecated", "info"]),
               help="Exit with non-zero code if findings at this level or higher")
+@click.option("--fix", is_flag=True,
+              help="Automatically fix auto-fixable deprecations using upgrade transforms")
 @click.option("--verbose", "-v", is_flag=True,
               help="Show detailed output including code context")
 def deprecations(
@@ -338,6 +347,7 @@ def deprecations(
     severity: str,
     output_json: bool,
     fail_on: str | None,
+    fix: bool,
     verbose: bool
 ) -> None:
     """
@@ -678,9 +688,25 @@ deprecation-check:
 ## Acceptance Criteria Checklist
 
 - [ ] `codeshift deprecations` scans and lists all deprecated patterns
-- [ ] Severity levels: INFO, WARNING, CRITICAL working correctly
-- [ ] Estimated timeline to breakage (based on `removed_in` version)
+- [ ] Severity levels: INFO, DEPRECATED, WARNING, CRITICAL working correctly
+- [ ] Estimated timeline to breakage (based on `removed_in` version and release_cycle metadata)
 - [ ] `codeshift watch` runs in background (optional daemon mode)
 - [ ] JSON output for CI integration (`--json` flag)
 - [ ] Exit codes for CI (`--fail-on` flag)
-- [ ] At least pydantic.yaml with comprehensive deprecation patterns
+- [ ] `--fix` flag auto-fixes deprecations using upgrade transforms
+- [ ] Deprecation YAML files for all 15 knowledge_base libraries:
+  - [ ] pydantic.yaml
+  - [ ] sqlalchemy.yaml
+  - [ ] fastapi.yaml
+  - [ ] django.yaml
+  - [ ] flask.yaml
+  - [ ] requests.yaml
+  - [ ] httpx.yaml
+  - [ ] aiohttp.yaml
+  - [ ] pandas.yaml
+  - [ ] numpy.yaml
+  - [ ] celery.yaml
+  - [ ] click.yaml
+  - [ ] pytest.yaml
+  - [ ] attrs.yaml
+  - [ ] marshmallow.yaml

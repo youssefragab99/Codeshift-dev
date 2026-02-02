@@ -1,0 +1,290 @@
+# Django REST Framework Knowledge Base
+# Breaking changes from 3.12 to 3.16
+
+name: djangorestframework
+display_name: Django REST Framework
+description: A powerful and flexible toolkit for building Web APIs in Django
+migration_guide_url: https://www.django-rest-framework.org/community/release-notes/
+
+supported_migrations:
+  - from: "3.12"
+    to: "3.13"
+  - from: "3.13"
+    to: "3.14"
+  - from: "3.14"
+    to: "3.15"
+  - from: "3.15"
+    to: "3.16"
+
+breaking_changes:
+  # Serializer field changes (3.12 -> 3.14)
+  - symbol: "serializers.NullBooleanField"
+    change_type: removed
+    severity: high
+    from_version: "3.12"
+    to_version: "3.14"
+    description: "NullBooleanField removed after deprecation in 3.12"
+    replacement: "serializers.BooleanField(allow_null=True)"
+    has_deterministic_transform: true
+    transform_name: null_boolean_field_to_boolean_field
+    notes: "Pending deprecation in 3.12, deprecated in 3.13, removed in 3.14"
+
+  # is_valid() breaking change (3.14)
+  - symbol: "serializer.is_valid(True)"
+    change_type: behavior_changed
+    severity: high
+    from_version: "3.13"
+    to_version: "3.14"
+    description: "raise_exception argument for is_valid() is now keyword-only"
+    replacement: "serializer.is_valid(raise_exception=True)"
+    has_deterministic_transform: true
+    transform_name: is_valid_keyword_only
+    notes: "Positional argument no longer accepted"
+
+  # ListField/DictField keyword-only child argument (3.13)
+  - symbol: "serializers.ListField(serializers.CharField())"
+    change_type: behavior_changed
+    severity: high
+    from_version: "3.12"
+    to_version: "3.13"
+    description: "ListField and DictField child argument must be keyword-only"
+    replacement: "serializers.ListField(child=serializers.CharField())"
+    has_deterministic_transform: true
+    transform_name: list_field_child_keyword
+    notes: "Positional child argument caused unexpected behavior"
+
+  - symbol: "serializers.DictField(serializers.CharField())"
+    change_type: behavior_changed
+    severity: high
+    from_version: "3.12"
+    to_version: "3.13"
+    description: "DictField child argument must be keyword-only"
+    replacement: "serializers.DictField(child=serializers.CharField())"
+    has_deterministic_transform: true
+    transform_name: dict_field_child_keyword
+    notes: "Positional child argument caused unexpected behavior"
+
+  # DjangoFilterBackend import change (3.6 -> 3.7)
+  - symbol: "rest_framework.filters.DjangoFilterBackend"
+    change_type: moved
+    severity: high
+    from_version: "3.6"
+    to_version: "3.7"
+    description: "DjangoFilterBackend moved to django-filter package"
+    replacement: "django_filters.rest_framework.DjangoFilterBackend"
+    has_deterministic_transform: true
+    transform_name: django_filter_backend_import
+    notes: "Requires installing django-filter and adding django_filters to INSTALLED_APPS"
+
+  # Validator set_context deprecation (3.11 -> 3.13)
+  - symbol: "Validator.set_context"
+    change_type: removed
+    severity: medium
+    from_version: "3.11"
+    to_version: "3.13"
+    description: "set_context method on validators removed, use requires_context attribute"
+    replacement: "requires_context = True attribute and serializer_field argument in __call__"
+    has_deterministic_transform: false
+    notes: "Custom validators must be rewritten to use requires_context pattern"
+
+  # Permission OR behavior change (3.14)
+  - symbol: "permission_classes OR operator"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "3.13"
+    to_version: "3.14"
+    description: "OR-ing permissions now requires both has_permission() and has_object_permission() to pass"
+    replacement: "Review permission logic when using OR operator"
+    has_deterministic_transform: false
+    notes: "Previously has_permission() was ignored when OR-ing permissions"
+
+  # Schema generation changes (3.10 -> 3.12)
+  - symbol: "rest_framework.schemas.AutoSchema"
+    change_type: deprecated
+    severity: medium
+    from_version: "3.10"
+    to_version: "3.12"
+    description: "CoreAPI-based schema generation deprecated in favor of OpenAPI"
+    replacement: "rest_framework.schemas.openapi.AutoSchema"
+    has_deterministic_transform: true
+    transform_name: coreapi_to_openapi_schema
+    notes: "CoreAPI schema support removed, OpenAPI is now the default"
+
+  - symbol: "DEFAULT_SCHEMA_CLASS (CoreAPI)"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "3.10"
+    to_version: "3.12"
+    description: "Default schema class changed from CoreAPI to OpenAPI AutoSchema"
+    replacement: "Set DEFAULT_SCHEMA_CLASS to rest_framework.schemas.coreapi.AutoSchema for backwards compatibility"
+    has_deterministic_transform: false
+    notes: "Must explicitly configure if still using CoreAPI schemas"
+
+  # AutoSchema._get_reference deprecation (3.16)
+  - symbol: "AutoSchema._get_reference"
+    change_type: removed
+    severity: low
+    from_version: "3.15"
+    to_version: "3.16"
+    description: "Deprecated _get_reference method removed from AutoSchema"
+    replacement: "Use public get_reference() method instead"
+    has_deterministic_transform: true
+    transform_name: get_reference_public_method
+    notes: "Method was made public in 3.14"
+
+  # exclude_from_schema deprecation
+  - symbol: "exclude_from_schema"
+    change_type: deprecated
+    severity: low
+    from_version: "3.9"
+    to_version: "3.12"
+    description: "exclude_from_schema on APIView and @api_view deprecated"
+    replacement: "schema = None or @schema(None)"
+    has_deterministic_transform: true
+    transform_name: exclude_from_schema_to_schema_none
+
+  # pytz to zoneinfo migration (3.15)
+  - symbol: "pytz timezone handling"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "3.14"
+    to_version: "3.15"
+    description: "pytz dependency removed, now uses ZoneInfo for timezone handling"
+    replacement: "Use zoneinfo.ZoneInfo instead of pytz.timezone"
+    has_deterministic_transform: false
+    notes: "Django provides ZoneInfo instances as primary timezone source"
+
+  # Request attribute changes (3.2)
+  - symbol: "request.DATA"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "3.2"
+    description: "request.DATA attribute removed"
+    replacement: "request.data"
+    has_deterministic_transform: true
+    transform_name: request_data_lowercase
+
+  - symbol: "request.QUERY_PARAMS"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "3.2"
+    description: "request.QUERY_PARAMS attribute removed"
+    replacement: "request.query_params"
+    has_deterministic_transform: true
+    transform_name: request_query_params_lowercase
+
+  # Pagination changes (3.1 -> 3.3)
+  - symbol: "PAGINATE_BY setting"
+    change_type: removed
+    severity: medium
+    from_version: "3.1"
+    to_version: "3.3"
+    description: "PAGINATE_BY settings key removed"
+    replacement: "PAGE_SIZE in REST_FRAMEWORK settings"
+    has_deterministic_transform: true
+    transform_name: paginate_by_to_page_size
+
+  - symbol: "PAGINATE_BY_PARAM setting"
+    change_type: removed
+    severity: medium
+    from_version: "3.1"
+    to_version: "3.3"
+    description: "PAGINATE_BY_PARAM settings key removed"
+    replacement: "Set page_size_query_param on pagination class"
+    has_deterministic_transform: false
+    notes: "Configure on pagination class instead of global setting"
+
+  - symbol: "MAX_PAGINATE_BY setting"
+    change_type: removed
+    severity: medium
+    from_version: "3.1"
+    to_version: "3.3"
+    description: "MAX_PAGINATE_BY settings key removed"
+    replacement: "Set max_page_size on pagination class"
+    has_deterministic_transform: false
+    notes: "Configure on pagination class instead of global setting"
+
+  - symbol: "DEFAULT_PAGINATION_CLASS default"
+    change_type: behavior_changed
+    severity: high
+    from_version: "3.6"
+    to_version: "3.7"
+    description: "DEFAULT_PAGINATION_CLASS now defaults to None instead of PageNumberPagination"
+    replacement: "Explicitly set DEFAULT_PAGINATION_CLASS in settings"
+    has_deterministic_transform: false
+    notes: "Must set both PAGE_SIZE and DEFAULT_PAGINATION_CLASS to enable pagination"
+
+  # View attribute deprecations (3.1 -> 3.3)
+  - symbol: "View.paginate_by"
+    change_type: removed
+    severity: medium
+    from_version: "3.1"
+    to_version: "3.3"
+    description: "paginate_by view attribute removed"
+    replacement: "Override pagination_class with custom page_size"
+    has_deterministic_transform: false
+    notes: "Use pagination class configuration instead"
+
+  - symbol: "View.paginate_by_param"
+    change_type: removed
+    severity: low
+    from_version: "3.1"
+    to_version: "3.3"
+    description: "paginate_by_param view attribute removed"
+    replacement: "Set page_size_query_param on pagination class"
+    has_deterministic_transform: false
+
+  - symbol: "View.max_paginate_by"
+    change_type: removed
+    severity: low
+    from_version: "3.1"
+    to_version: "3.3"
+    description: "max_paginate_by view attribute removed"
+    replacement: "Set max_page_size on pagination class"
+    has_deterministic_transform: false
+
+  # SimpleRouter use_regex_path (3.15)
+  - symbol: "SimpleRouter URL patterns"
+    change_type: behavior_changed
+    severity: low
+    from_version: "3.14"
+    to_version: "3.15"
+    description: "SimpleRouter can now use path converters instead of regex with use_regex_path=False"
+    replacement: "SimpleRouter(use_regex_path=False) for non-regex URLs"
+    has_deterministic_transform: false
+    notes: "Optional trailing slash not available when use_regex_path=False"
+
+  # Partial serializer required fields (3.15)
+  - symbol: "Serializer partial update"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "3.14"
+    to_version: "3.15"
+    description: "Partial serializers no longer have required fields"
+    replacement: "Review partial update behavior in serializers"
+    has_deterministic_transform: false
+    notes: "Fields are not required during partial updates"
+
+  # DateTimeField timezone behavior
+  - symbol: "DateTimeField timezone serialization"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "3.11"
+    to_version: "3.12"
+    description: "DateTimeField now respects active/default timezone during serialization instead of always using UTC"
+    replacement: "Review datetime serialization if relying on UTC output"
+    has_deterministic_transform: false
+    notes: "Instances serialized with supplied datetime for create but active timezone for retrieve"
+
+  # UniqueConstraint validation (3.15, 3.16)
+  - symbol: "ModelSerializer UniqueConstraint"
+    change_type: behavior_changed
+    severity: low
+    from_version: "3.14"
+    to_version: "3.15"
+    description: "ModelSerializer now generates validators for UniqueConstraint automatically"
+    replacement: "Review validators if manually handling UniqueConstraint"
+    has_deterministic_transform: false
+    notes: "Generates both UniqueValidator and UniqueTogetherValidator"

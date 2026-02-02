@@ -1,0 +1,536 @@
+# PyMongo Knowledge Base
+# Breaking changes from v3.x to v4.x
+
+name: pymongo
+display_name: PyMongo
+description: Official MongoDB driver for Python
+migration_guide_url: https://pymongo.readthedocs.io/en/stable/migrate-to-pymongo4.html
+
+supported_migrations:
+  - from: "3.0"
+    to: "4.0"
+
+breaking_changes:
+  # Collection method changes - CRUD operations
+  - symbol: "Collection.insert"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "insert() method removed, use insert_one() for single documents or insert_many() for multiple documents"
+    replacement: "insert_one(document) or insert_many(documents)"
+    has_deterministic_transform: true
+    transform_name: insert_to_insert_one_or_many
+    notes: "insert() could accept single document or list; replacement depends on argument type"
+
+  - symbol: "Collection.save"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "save() method removed, use insert_one() for new documents or replace_one() with upsert=True for existing"
+    replacement: "insert_one(document) or replace_one({'_id': doc['_id']}, doc, upsert=True)"
+    has_deterministic_transform: false
+    notes: "Replacement depends on whether document has _id and exists in collection"
+
+  - symbol: "Collection.update"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "update() method removed, use update_one() for single document or update_many() for multiple documents"
+    replacement: "update_one(filter, update) or update_many(filter, update)"
+    has_deterministic_transform: true
+    transform_name: update_to_update_one_or_many
+    notes: "Default behavior was multi=False, so update_one() is the direct replacement in most cases"
+
+  - symbol: "Collection.remove"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "remove() method removed, use delete_one() for single document or delete_many() for multiple documents"
+    replacement: "delete_one(filter) or delete_many(filter)"
+    has_deterministic_transform: true
+    transform_name: remove_to_delete_one_or_many
+    notes: "Default behavior was multi=True, so delete_many() is the direct replacement in most cases"
+
+  - symbol: "Collection.find_and_modify"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "find_and_modify() method removed, use find_one_and_update(), find_one_and_replace(), or find_one_and_delete()"
+    replacement: "find_one_and_update(), find_one_and_replace(), or find_one_and_delete()"
+    has_deterministic_transform: false
+    notes: "Replacement method depends on the remove and update parameters used"
+
+  - symbol: "Collection.count"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "count() method removed, use count_documents(filter) or estimated_document_count() for total count"
+    replacement: "count_documents(filter) or estimated_document_count()"
+    has_deterministic_transform: true
+    transform_name: count_to_count_documents
+    notes: "count_documents() is accurate but slower; estimated_document_count() is fast but approximate"
+
+  - symbol: "Collection.ensure_index"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "ensure_index() method removed, use create_index() instead"
+    replacement: "create_index(keys, **kwargs)"
+    has_deterministic_transform: true
+    transform_name: ensure_index_to_create_index
+    notes: "ensure_index() had internal caching; applications should avoid frequent calls to create_index()"
+
+  - symbol: "Collection.group"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "group() method removed (MongoDB 4.2 removed group command), use aggregate() with $group stage"
+    replacement: "aggregate([{'$group': {...}}])"
+    has_deterministic_transform: false
+    notes: "Requires converting group() parameters to aggregation pipeline syntax"
+
+  - symbol: "Collection.map_reduce"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "map_reduce() method removed, migrate to aggregate() or run mapReduce command directly"
+    replacement: "aggregate() pipeline or db.command('mapReduce', ...)"
+    has_deterministic_transform: false
+    notes: "Aggregation pipeline is the preferred replacement for most map-reduce operations"
+
+  - symbol: "Collection.inline_map_reduce"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "inline_map_reduce() method removed, migrate to aggregate() or run mapReduce command directly"
+    replacement: "aggregate() pipeline or db.command('mapReduce', ...)"
+    has_deterministic_transform: false
+
+  - symbol: "Collection.reindex"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "reindex() method removed, run reIndex command directly"
+    replacement: "db.command('reIndex', collection_name)"
+    has_deterministic_transform: true
+    transform_name: reindex_to_command
+
+  - symbol: "Collection.initialize_ordered_bulk_op"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "Bulk operation initialization methods removed, use bulk_write() with operation objects"
+    replacement: "bulk_write([InsertOne(doc), UpdateOne(filter, update), DeleteOne(filter)])"
+    has_deterministic_transform: false
+    notes: "Requires importing operation classes from pymongo"
+
+  - symbol: "Collection.initialize_unordered_bulk_op"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "Bulk operation initialization methods removed, use bulk_write() with ordered=False"
+    replacement: "bulk_write([...], ordered=False)"
+    has_deterministic_transform: false
+
+  # Database method changes
+  - symbol: "Database.collection_names"
+    change_type: renamed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "collection_names() method renamed to list_collection_names()"
+    replacement: "list_collection_names()"
+    has_deterministic_transform: true
+    transform_name: collection_names_to_list_collection_names
+
+  - symbol: "Database.authenticate"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "authenticate() method removed, pass credentials to MongoClient constructor instead"
+    replacement: "MongoClient(username='user', password='pass', authSource='db')"
+    has_deterministic_transform: false
+    notes: "Create MongoClient with credentials rather than authenticating after connection"
+
+  - symbol: "Database.logout"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "logout() method removed, create a new MongoClient without credentials instead"
+    replacement: "Create new MongoClient without credentials"
+    has_deterministic_transform: false
+
+  - symbol: "Database.add_user"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "add_user() method removed, use createUser command"
+    replacement: "db.command('createUser', 'username', pwd='password', roles=[...])"
+    has_deterministic_transform: false
+
+  - symbol: "Database.remove_user"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "remove_user() method removed, use dropUser command"
+    replacement: "db.command('dropUser', 'username')"
+    has_deterministic_transform: true
+    transform_name: remove_user_to_command
+
+  - symbol: "Database.eval"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "eval() method removed (MongoDB 4.2 removed eval command), no direct replacement"
+    replacement: "No replacement - refactor to use aggregation pipeline or application-side logic"
+    has_deterministic_transform: false
+    notes: "Server-side JavaScript execution is no longer supported in MongoDB 4.2+"
+
+  - symbol: "Database.system_js"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "system_js property removed (MongoDB 4.2 removed server-side JS support)"
+    replacement: "No replacement - move logic to application code"
+    has_deterministic_transform: false
+
+  - symbol: "Database.current_op"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "current_op() method removed, use $currentOp aggregation stage"
+    replacement: "db.aggregate([{'$currentOp': {}}])"
+    has_deterministic_transform: true
+    transform_name: current_op_to_aggregate
+
+  - symbol: "Database.profiling_level"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "profiling_level() method removed, use profile command"
+    replacement: "db.command('profile', -1)"
+    has_deterministic_transform: true
+    transform_name: profiling_level_to_command
+
+  - symbol: "Database.set_profiling_level"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "set_profiling_level() method removed, use profile command"
+    replacement: "db.command('profile', level)"
+    has_deterministic_transform: true
+    transform_name: set_profiling_level_to_command
+
+  - symbol: "Database.profiling_info"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "profiling_info() method removed, query system.profile collection directly"
+    replacement: "list(db.system.profile.find())"
+    has_deterministic_transform: true
+    transform_name: profiling_info_to_find
+
+  - symbol: "Database.error"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "error() method removed, all write operations use acknowledged write concern by default"
+    replacement: "Check write result directly"
+    has_deterministic_transform: false
+    notes: "Obsolete with acknowledged writes as default"
+
+  - symbol: "Database.last_status"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "last_status() method removed, all write operations report errors by default"
+    replacement: "Check write result directly"
+    has_deterministic_transform: false
+
+  # MongoClient changes
+  - symbol: "MongoClient.database_names"
+    change_type: renamed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "database_names() method renamed to list_database_names()"
+    replacement: "list_database_names()"
+    has_deterministic_transform: true
+    transform_name: database_names_to_list_database_names
+
+  - symbol: "MongoClient.close_cursor"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "close_cursor() method removed, use Cursor.close() instead"
+    replacement: "cursor.close()"
+    has_deterministic_transform: false
+
+  - symbol: "MongoClient.kill_cursors"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "kill_cursors() method removed, use Cursor.close() instead"
+    replacement: "cursor.close()"
+    has_deterministic_transform: false
+
+  - symbol: "MongoClient.fsync"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "fsync() method removed, run fsync command directly"
+    replacement: "client.admin.command('fsync')"
+    has_deterministic_transform: true
+    transform_name: fsync_to_command
+
+  - symbol: "MongoClient.unlock"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "unlock() method removed, run fsyncUnlock command directly"
+    replacement: "client.admin.command('fsyncUnlock')"
+    has_deterministic_transform: true
+    transform_name: unlock_to_command
+
+  - symbol: "MongoClient.is_locked"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "is_locked property removed, query currentOp command"
+    replacement: "client.admin.command('currentOp')"
+    has_deterministic_transform: false
+
+  - symbol: "MongoReplicaSetClient"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "MongoReplicaSetClient removed, use MongoClient instead (identical since PyMongo 3.0)"
+    replacement: "MongoClient"
+    has_deterministic_transform: true
+    transform_name: mongoreplicasetclient_to_mongoclient
+
+  # MongoClient parameter changes
+  - symbol: "MongoClient(waitQueueMultiple=...)"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "waitQueueMultiple parameter removed, use application-side thread pool instead"
+    replacement: "Remove parameter and manage concurrency at application level"
+    has_deterministic_transform: true
+    transform_name: remove_wait_queue_multiple
+
+  - symbol: "MongoClient(socketKeepAlive=...)"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "socketKeepAlive parameter removed, TCP keepalive is now always enabled"
+    replacement: "Remove parameter (keepalive always on)"
+    has_deterministic_transform: true
+    transform_name: remove_socket_keep_alive
+
+  # SSL/TLS parameter renames
+  - symbol: "MongoClient(ssl_certfile=...)"
+    change_type: renamed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "ssl_certfile parameter renamed to tlsCertificateKeyFile"
+    replacement: "tlsCertificateKeyFile"
+    has_deterministic_transform: true
+    transform_name: ssl_certfile_to_tls
+
+  - symbol: "MongoClient(ssl_ca_certs=...)"
+    change_type: renamed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "ssl_ca_certs parameter renamed to tlsCAFile"
+    replacement: "tlsCAFile"
+    has_deterministic_transform: true
+    transform_name: ssl_ca_certs_to_tls
+
+  - symbol: "MongoClient(ssl_keyfile=...)"
+    change_type: renamed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "ssl_keyfile parameter renamed to tlsCertificateKeyFile (combined with certfile)"
+    replacement: "tlsCertificateKeyFile"
+    has_deterministic_transform: true
+    transform_name: ssl_keyfile_to_tls
+
+  - symbol: "MongoClient(ssl_pem_passphrase=...)"
+    change_type: renamed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "ssl_pem_passphrase parameter renamed to tlsCertificateKeyFilePassword"
+    replacement: "tlsCertificateKeyFilePassword"
+    has_deterministic_transform: true
+    transform_name: ssl_pem_passphrase_to_tls
+
+  - symbol: "MongoClient(ssl_crlfile=...)"
+    change_type: renamed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "ssl_crlfile parameter renamed to tlsCRLFile"
+    replacement: "tlsCRLFile"
+    has_deterministic_transform: true
+    transform_name: ssl_crlfile_to_tls
+
+  # Cursor changes
+  - symbol: "Cursor.count"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "Cursor.count() removed, use Collection.count_documents() with the same filter"
+    replacement: "collection.count_documents(filter)"
+    has_deterministic_transform: false
+    notes: "Must be called on collection with the cursor's filter, not on cursor itself"
+
+  - symbol: "find(modifiers=...)"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "modifiers parameter removed from find(), pass options directly as parameters"
+    replacement: "Pass $hint, $comment, etc. as hint=, comment= parameters"
+    has_deterministic_transform: false
+    notes: "Each modifier must be converted to its corresponding parameter"
+
+  # BSON changes
+  - symbol: "SON.iteritems"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "SON.iteritems() removed, use items() instead (now returns dict_items)"
+    replacement: "items()"
+    has_deterministic_transform: true
+    transform_name: son_iteritems_to_items
+
+  - symbol: "bson.json_util.LEGACY_JSON_OPTIONS"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "Default JSON options changed from LEGACY to RELAXED_JSON_OPTIONS"
+    replacement: "Explicitly use json_options=LEGACY_JSON_OPTIONS if legacy format needed"
+    has_deterministic_transform: false
+    notes: "May affect JSON serialization format of dates, ObjectIds, etc."
+
+  - symbol: "bson.codec_options.CodecOptions(tz_aware=...)"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "Default tz_aware changed from True to False in JSONOptions"
+    replacement: "Explicitly set tz_aware=True if timezone-aware datetimes needed"
+    has_deterministic_transform: false
+
+  - symbol: "bson.binary.UUIDLegacy"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "UUIDLegacy class removed, use Binary.from_uuid() with uuid_representation"
+    replacement: "Binary.from_uuid(uuid_val, UuidRepresentation.PYTHON_LEGACY)"
+    has_deterministic_transform: true
+    transform_name: uuid_legacy_to_binary
+
+  # Exception changes
+  - symbol: "pymongo.errors.NotMasterError"
+    change_type: renamed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "NotMasterError renamed to NotPrimaryError"
+    replacement: "NotPrimaryError"
+    has_deterministic_transform: true
+    transform_name: notmastererror_to_notprimaryerror
+
+  - symbol: "pymongo.errors.CertificateError"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "CertificateError removed, SSL certificate errors handled internally"
+    replacement: "No replacement needed - errors handled internally"
+    has_deterministic_transform: false
+
+  # Removed constants
+  - symbol: "pymongo.GEOHAYSTACK"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "GEOHAYSTACK index type constant removed (MongoDB 5.0 removed geoHaystack indexes)"
+    replacement: "Use GEO2D or GEO2DSPHERE indexes"
+    has_deterministic_transform: false
+
+  # GridFS changes
+  - symbol: "gridfs.GridFS(disable_md5=...)"
+    change_type: removed
+    severity: low
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "disable_md5 parameter removed, MD5 checksums no longer generated"
+    replacement: "Remove parameter (MD5 never generated now)"
+    has_deterministic_transform: true
+    transform_name: remove_disable_md5
+
+  # SONManipulator removal
+  - symbol: "pymongo.son_manipulator.SONManipulator"
+    change_type: removed
+    severity: high
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "SONManipulator API removed, use TypeCodec/TypeRegistry or transform documents in application code"
+    replacement: "TypeCodec and TypeRegistry for custom types, or manual document transformation"
+    has_deterministic_transform: false
+    notes: "Was deprecated since PyMongo 3.0"
+
+  - symbol: "Collection.find(manipulate=...)"
+    change_type: removed
+    severity: medium
+    from_version: "3.0"
+    to_version: "4.0"
+    description: "manipulate parameter removed from find operations with SONManipulator removal"
+    replacement: "Remove parameter and handle document transformation in application code"
+    has_deterministic_transform: true
+    transform_name: remove_manipulate_param

@@ -1,0 +1,616 @@
+# Pillow (PIL Fork) Knowledge Base
+# Breaking changes from v8.x to v10.x
+
+name: pillow
+display_name: Pillow (PIL Fork)
+description: Python Imaging Library fork for image processing and manipulation
+migration_guide_url: https://pillow.readthedocs.io/en/stable/deprecations.html
+
+supported_migrations:
+  - from: "8.0"
+    to: "10.0"
+  - from: "9.0"
+    to: "10.0"
+
+breaking_changes:
+  # Resampling filter constant changes (removed in 10.0.0)
+  - symbol: "Image.ANTIALIAS"
+    change_type: removed
+    severity: high
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.ANTIALIAS constant removed, replaced with Resampling enum"
+    replacement: "Image.Resampling.LANCZOS"
+    has_deterministic_transform: true
+    transform_name: antialias_to_resampling_lanczos
+    notes: "ANTIALIAS was an alias for LANCZOS since Pillow 2.7.0"
+
+  - symbol: "Image.LINEAR"
+    change_type: removed
+    severity: high
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.LINEAR constant removed, replaced with Resampling enum"
+    replacement: "Image.Resampling.BILINEAR"
+    has_deterministic_transform: true
+    transform_name: linear_to_resampling_bilinear
+
+  - symbol: "Image.CUBIC"
+    change_type: removed
+    severity: high
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.CUBIC constant removed, replaced with Resampling enum"
+    replacement: "Image.Resampling.BICUBIC"
+    has_deterministic_transform: true
+    transform_name: cubic_to_resampling_bicubic
+
+  - symbol: "Image.BILINEAR"
+    change_type: removed
+    severity: high
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.BILINEAR constant removed, replaced with Resampling enum"
+    replacement: "Image.Resampling.BILINEAR"
+    has_deterministic_transform: true
+    transform_name: bilinear_to_resampling_bilinear
+
+  - symbol: "Image.BICUBIC"
+    change_type: removed
+    severity: high
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.BICUBIC constant removed, replaced with Resampling enum"
+    replacement: "Image.Resampling.BICUBIC"
+    has_deterministic_transform: true
+    transform_name: bicubic_to_resampling_bicubic
+
+  - symbol: "Image.LANCZOS"
+    change_type: removed
+    severity: high
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.LANCZOS constant removed, replaced with Resampling enum"
+    replacement: "Image.Resampling.LANCZOS"
+    has_deterministic_transform: true
+    transform_name: lanczos_to_resampling_lanczos
+
+  - symbol: "Image.NEAREST"
+    change_type: removed
+    severity: high
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.NEAREST constant removed, replaced with Resampling enum"
+    replacement: "Image.Resampling.NEAREST"
+    has_deterministic_transform: true
+    transform_name: nearest_to_resampling_nearest
+
+  - symbol: "Image.BOX"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.BOX constant removed, replaced with Resampling enum"
+    replacement: "Image.Resampling.BOX"
+    has_deterministic_transform: true
+    transform_name: box_to_resampling_box
+
+  - symbol: "Image.HAMMING"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.HAMMING constant removed, replaced with Resampling enum"
+    replacement: "Image.Resampling.HAMMING"
+    has_deterministic_transform: true
+    transform_name: hamming_to_resampling_hamming
+
+  # Font method changes (removed in 10.0.0)
+  - symbol: "FreeTypeFont.getsize"
+    change_type: removed
+    severity: high
+    from_version: "9.2.0"
+    to_version: "10.0.0"
+    description: "FreeTypeFont.getsize() method removed, use getbbox() for dimensions"
+    replacement: "font.getbbox(text) returns (left, top, right, bottom); width = right - left, height = bottom - top"
+    has_deterministic_transform: false
+    notes: "getbbox() returns a 4-tuple bounding box, not a 2-tuple size. Height calculation differs slightly."
+
+  - symbol: "FreeTypeFont.getoffset"
+    change_type: removed
+    severity: medium
+    from_version: "9.2.0"
+    to_version: "10.0.0"
+    description: "FreeTypeFont.getoffset() method removed, offset info available in getbbox()"
+    replacement: "font.getbbox(text) returns (left, top, right, bottom); offset is (left, top)"
+    has_deterministic_transform: false
+    notes: "The offset values are now the left and top values from getbbox()"
+
+  - symbol: "FreeTypeFont.getsize_multiline"
+    change_type: removed
+    severity: medium
+    from_version: "9.2.0"
+    to_version: "10.0.0"
+    description: "FreeTypeFont.getsize_multiline() removed, use ImageDraw.multiline_textbbox()"
+    replacement: "ImageDraw.Draw(im).multiline_textbbox((0, 0), text, font)"
+    has_deterministic_transform: false
+    notes: "Requires creating an ImageDraw object"
+
+  # ImageDraw text method changes (removed in 10.0.0)
+  - symbol: "ImageDraw.textsize"
+    change_type: removed
+    severity: high
+    from_version: "9.2.0"
+    to_version: "10.0.0"
+    description: "ImageDraw.textsize() method removed, use textbbox() or textlength()"
+    replacement: "draw.textbbox((0, 0), text, font) for bbox; draw.textlength(text, font) for width"
+    has_deterministic_transform: false
+    notes: "textbbox() returns 4-tuple (left, top, right, bottom), textlength() returns width only"
+
+  - symbol: "ImageDraw.multiline_textsize"
+    change_type: removed
+    severity: medium
+    from_version: "9.2.0"
+    to_version: "10.0.0"
+    description: "ImageDraw.multiline_textsize() removed, use multiline_textbbox()"
+    replacement: "draw.multiline_textbbox((0, 0), text, font)"
+    has_deterministic_transform: false
+    notes: "Returns 4-tuple bounding box instead of 2-tuple size"
+
+  # ImageFont layout constants (removed in 10.0.0)
+  - symbol: "ImageFont.LAYOUT_BASIC"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "ImageFont.LAYOUT_BASIC constant removed, replaced with Layout enum"
+    replacement: "ImageFont.Layout.BASIC"
+    has_deterministic_transform: true
+    transform_name: layout_basic_to_enum
+
+  - symbol: "ImageFont.LAYOUT_RAQM"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "ImageFont.LAYOUT_RAQM constant removed, replaced with Layout enum"
+    replacement: "ImageFont.Layout.RAQM"
+    has_deterministic_transform: true
+    transform_name: layout_raqm_to_enum
+
+  # ImageCms constants (removed in 10.0.0)
+  - symbol: "ImageCms.INTENT_PERCEPTUAL"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "ImageCms.INTENT_PERCEPTUAL constant removed, replaced with Intent enum"
+    replacement: "ImageCms.Intent.PERCEPTUAL"
+    has_deterministic_transform: true
+    transform_name: intent_perceptual_to_enum
+
+  - symbol: "ImageCms.INTENT_RELATIVE_COLORIMETRIC"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "ImageCms.INTENT_RELATIVE_COLORIMETRIC constant removed"
+    replacement: "ImageCms.Intent.RELATIVE_COLORIMETRIC"
+    has_deterministic_transform: true
+    transform_name: intent_relative_colorimetric_to_enum
+
+  - symbol: "ImageCms.INTENT_SATURATION"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "ImageCms.INTENT_SATURATION constant removed"
+    replacement: "ImageCms.Intent.SATURATION"
+    has_deterministic_transform: true
+    transform_name: intent_saturation_to_enum
+
+  - symbol: "ImageCms.INTENT_ABSOLUTE_COLORIMETRIC"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "ImageCms.INTENT_ABSOLUTE_COLORIMETRIC constant removed"
+    replacement: "ImageCms.Intent.ABSOLUTE_COLORIMETRIC"
+    has_deterministic_transform: true
+    transform_name: intent_absolute_colorimetric_to_enum
+
+  - symbol: "ImageCms.DIRECTION_INPUT"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "ImageCms.DIRECTION_INPUT constant removed, replaced with Direction enum"
+    replacement: "ImageCms.Direction.INPUT"
+    has_deterministic_transform: true
+    transform_name: direction_input_to_enum
+
+  - symbol: "ImageCms.DIRECTION_OUTPUT"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "ImageCms.DIRECTION_OUTPUT constant removed"
+    replacement: "ImageCms.Direction.OUTPUT"
+    has_deterministic_transform: true
+    transform_name: direction_output_to_enum
+
+  - symbol: "ImageCms.DIRECTION_PROOF"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "ImageCms.DIRECTION_PROOF constant removed"
+    replacement: "ImageCms.Direction.PROOF"
+    has_deterministic_transform: true
+    transform_name: direction_proof_to_enum
+
+  # Dither constants (removed in 10.0.0)
+  - symbol: "Image.NONE"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.NONE dither constant removed, replaced with Dither enum"
+    replacement: "Image.Dither.NONE"
+    has_deterministic_transform: true
+    transform_name: none_to_dither_none
+    notes: "Used for dithering parameter in quantize() and convert()"
+
+  - symbol: "Image.ORDERED"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.ORDERED dither constant removed"
+    replacement: "Image.Dither.ORDERED"
+    has_deterministic_transform: true
+    transform_name: ordered_to_dither_ordered
+
+  - symbol: "Image.FLOYDSTEINBERG"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.FLOYDSTEINBERG dither constant removed"
+    replacement: "Image.Dither.FLOYDSTEINBERG"
+    has_deterministic_transform: true
+    transform_name: floydsteinberg_to_dither_floydsteinberg
+
+  # Transform constants (removed in 10.0.0)
+  - symbol: "Image.AFFINE"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.AFFINE transform constant removed"
+    replacement: "Image.Transform.AFFINE"
+    has_deterministic_transform: true
+    transform_name: affine_to_transform_affine
+
+  - symbol: "Image.EXTENT"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.EXTENT transform constant removed"
+    replacement: "Image.Transform.EXTENT"
+    has_deterministic_transform: true
+    transform_name: extent_to_transform_extent
+
+  - symbol: "Image.PERSPECTIVE"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.PERSPECTIVE transform constant removed"
+    replacement: "Image.Transform.PERSPECTIVE"
+    has_deterministic_transform: true
+    transform_name: perspective_to_transform_perspective
+
+  - symbol: "Image.QUAD"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.QUAD transform constant removed"
+    replacement: "Image.Transform.QUAD"
+    has_deterministic_transform: true
+    transform_name: quad_to_transform_quad
+
+  - symbol: "Image.MESH"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.MESH transform constant removed"
+    replacement: "Image.Transform.MESH"
+    has_deterministic_transform: true
+    transform_name: mesh_to_transform_mesh
+
+  # Transpose constants (removed in 10.0.0)
+  - symbol: "Image.FLIP_LEFT_RIGHT"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.FLIP_LEFT_RIGHT constant removed"
+    replacement: "Image.Transpose.FLIP_LEFT_RIGHT"
+    has_deterministic_transform: true
+    transform_name: flip_left_right_to_transpose
+
+  - symbol: "Image.FLIP_TOP_BOTTOM"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.FLIP_TOP_BOTTOM constant removed"
+    replacement: "Image.Transpose.FLIP_TOP_BOTTOM"
+    has_deterministic_transform: true
+    transform_name: flip_top_bottom_to_transpose
+
+  - symbol: "Image.ROTATE_90"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.ROTATE_90 constant removed"
+    replacement: "Image.Transpose.ROTATE_90"
+    has_deterministic_transform: true
+    transform_name: rotate_90_to_transpose
+
+  - symbol: "Image.ROTATE_180"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.ROTATE_180 constant removed"
+    replacement: "Image.Transpose.ROTATE_180"
+    has_deterministic_transform: true
+    transform_name: rotate_180_to_transpose
+
+  - symbol: "Image.ROTATE_270"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.ROTATE_270 constant removed"
+    replacement: "Image.Transpose.ROTATE_270"
+    has_deterministic_transform: true
+    transform_name: rotate_270_to_transpose
+
+  - symbol: "Image.TRANSPOSE"
+    change_type: removed
+    severity: medium
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.TRANSPOSE constant removed"
+    replacement: "Image.Transpose.TRANSPOSE"
+    has_deterministic_transform: true
+    transform_name: transpose_constant_to_transpose
+
+  - symbol: "Image.TRANSVERSE"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.TRANSVERSE constant removed"
+    replacement: "Image.Transpose.TRANSVERSE"
+    has_deterministic_transform: true
+    transform_name: transverse_to_transpose
+
+  # Palette constants (removed in 10.0.0)
+  - symbol: "Image.WEB"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.WEB palette constant removed"
+    replacement: "Image.Palette.WEB"
+    has_deterministic_transform: true
+    transform_name: web_to_palette_web
+
+  - symbol: "Image.ADAPTIVE"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.ADAPTIVE palette constant removed"
+    replacement: "Image.Palette.ADAPTIVE"
+    has_deterministic_transform: true
+    transform_name: adaptive_to_palette_adaptive
+
+  # Quantize constants (removed in 10.0.0)
+  - symbol: "Image.MEDIANCUT"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.MEDIANCUT quantize constant removed"
+    replacement: "Image.Quantize.MEDIANCUT"
+    has_deterministic_transform: true
+    transform_name: mediancut_to_quantize_mediancut
+
+  - symbol: "Image.MAXCOVERAGE"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.MAXCOVERAGE quantize constant removed"
+    replacement: "Image.Quantize.MAXCOVERAGE"
+    has_deterministic_transform: true
+    transform_name: maxcoverage_to_quantize_maxcoverage
+
+  - symbol: "Image.FASTOCTREE"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.FASTOCTREE quantize constant removed"
+    replacement: "Image.Quantize.FASTOCTREE"
+    has_deterministic_transform: true
+    transform_name: fastoctree_to_quantize_fastoctree
+
+  - symbol: "Image.LIBIMAGEQUANT"
+    change_type: removed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "Image.LIBIMAGEQUANT quantize constant removed"
+    replacement: "Image.Quantize.LIBIMAGEQUANT"
+    has_deterministic_transform: true
+    transform_name: libimagequant_to_quantize_libimagequant
+
+  # 9.0.0 removals
+  - symbol: "PILLOW_VERSION"
+    change_type: removed
+    severity: high
+    from_version: "7.0.0"
+    to_version: "9.0.0"
+    description: "PILLOW_VERSION constant removed after deprecation"
+    replacement: "__version__"
+    has_deterministic_transform: true
+    transform_name: pillow_version_to_dunder_version
+    notes: "Import PIL; PIL.__version__ or from PIL import __version__"
+
+  - symbol: "Image.show(command=...)"
+    change_type: removed
+    severity: medium
+    from_version: "7.2.0"
+    to_version: "9.0.0"
+    description: "command parameter removed from Image.show()"
+    replacement: "Create a custom ImageShow.Viewer subclass"
+    has_deterministic_transform: false
+    notes: "Requires creating and registering a custom viewer class"
+
+  - symbol: "Image._showxv"
+    change_type: removed
+    severity: low
+    from_version: "7.2.0"
+    to_version: "9.0.0"
+    description: "Image._showxv() internal method removed"
+    replacement: "Image.show() with custom ImageShow.Viewer"
+    has_deterministic_transform: false
+
+  - symbol: "ImageFile.raise_ioerror"
+    change_type: renamed
+    severity: low
+    from_version: "7.2.0"
+    to_version: "9.0.0"
+    description: "ImageFile.raise_ioerror renamed to raise_oserror"
+    replacement: "ImageFile.raise_oserror"
+    has_deterministic_transform: true
+    transform_name: raise_ioerror_to_raise_oserror
+    notes: "Aligns with Python 3.3+ where IOError merged into OSError"
+
+  # 10.0.0 other removals
+  - symbol: "Image.category"
+    change_type: removed
+    severity: medium
+    from_version: "9.2.0"
+    to_version: "10.0.0"
+    description: "Image.category attribute and related constants removed"
+    replacement: "getattr(im, 'is_animated', False) for animation detection"
+    has_deterministic_transform: false
+    notes: "Image.NORMAL, Image.SEQUENCE, Image.CONTAINER also removed"
+
+  - symbol: "JpegImagePlugin.convert_dict_qtables"
+    change_type: removed
+    severity: low
+    from_version: "8.3.0"
+    to_version: "10.0.0"
+    description: "JpegImagePlugin.convert_dict_qtables() function removed"
+    replacement: "Quantization tables handled automatically"
+    has_deterministic_transform: false
+
+  - symbol: "ImagePalette(size=...)"
+    change_type: removed
+    severity: low
+    from_version: "8.3.0"
+    to_version: "10.0.0"
+    description: "ImagePalette size parameter removed"
+    replacement: "Remove the size parameter from ImagePalette constructor"
+    has_deterministic_transform: true
+    transform_name: imagepalette_remove_size
+
+  - symbol: "ImageShow.Viewer.show_file(file=...)"
+    change_type: renamed
+    severity: low
+    from_version: "9.1.0"
+    to_version: "10.0.0"
+    description: "show_file() file parameter renamed to path"
+    replacement: "show_file(path=...)"
+    has_deterministic_transform: true
+    transform_name: show_file_file_to_path
+
+  - symbol: "FreeTypeFont.getmask2(fill=...)"
+    change_type: removed
+    severity: low
+    from_version: "9.2.0"
+    to_version: "10.0.0"
+    description: "fill parameter removed from FreeTypeFont.getmask2()"
+    replacement: "Remove the fill parameter"
+    has_deterministic_transform: true
+    transform_name: getmask2_remove_fill
+
+  - symbol: "PhotoImage.paste(box=...)"
+    change_type: removed
+    severity: low
+    from_version: "9.2.0"
+    to_version: "10.0.0"
+    description: "box parameter removed from PhotoImage.paste()"
+    replacement: "Remove the box parameter"
+    has_deterministic_transform: true
+    transform_name: photoimage_paste_remove_box
+
+  # ImageCms additional removals (12.0.0)
+  - symbol: "ImageCms.DESCRIPTION"
+    change_type: removed
+    severity: low
+    from_version: "10.3.0"
+    to_version: "12.0.0"
+    description: "ImageCms.DESCRIPTION constant removed"
+    replacement: "No direct replacement; use littlecms documentation"
+    has_deterministic_transform: false
+
+  - symbol: "ImageCms.VERSION"
+    change_type: removed
+    severity: low
+    from_version: "10.3.0"
+    to_version: "12.0.0"
+    description: "ImageCms.VERSION constant removed"
+    replacement: "No direct replacement"
+    has_deterministic_transform: false
+
+  - symbol: "ImageCms.FLAGS"
+    change_type: removed
+    severity: medium
+    from_version: "10.3.0"
+    to_version: "12.0.0"
+    description: "ImageCms.FLAGS dictionary removed"
+    replacement: "ImageCms.Flags enum"
+    has_deterministic_transform: true
+    transform_name: imagecms_flags_to_enum
+
+  - symbol: "ImageCms.versions"
+    change_type: removed
+    severity: low
+    from_version: "10.3.0"
+    to_version: "12.0.0"
+    description: "ImageCms.versions() function removed"
+    replacement: "No direct replacement; use features.version_module()"
+    has_deterministic_transform: false
+
+  - symbol: "Image.isImageType"
+    change_type: removed
+    severity: medium
+    from_version: "10.1.0"
+    to_version: "12.0.0"
+    description: "Image.isImageType() function removed"
+    replacement: "isinstance(im, Image.Image)"
+    has_deterministic_transform: true
+    transform_name: isImageType_to_isinstance

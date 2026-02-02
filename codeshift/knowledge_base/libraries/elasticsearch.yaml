@@ -1,0 +1,333 @@
+# Elasticsearch Python Client Knowledge Base
+# Breaking changes from v7.x to v8.x
+
+name: elasticsearch
+display_name: Elasticsearch Python Client
+description: Official Python client for Elasticsearch
+migration_guide_url: https://www.elastic.co/guide/en/elasticsearch/client/python-api/8.19/migration.html
+
+supported_migrations:
+  - from: "7.0"
+    to: "8.0"
+
+breaking_changes:
+  # Client initialization changes
+  - symbol: "Elasticsearch.__init__"
+    change_type: behavior_changed
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "Default host configuration removed. Previously defaulted to http://localhost:9200, now requires explicit scheme, host, and port configuration"
+    replacement: "Elasticsearch('http://localhost:9200') or Elasticsearch(cloud_id='...')"
+    has_deterministic_transform: false
+    notes: "Elasticsearch 8.0 enables HTTPS by default, so explicit configuration prevents confusion about which cluster is being connected to"
+
+  - symbol: "Elasticsearch(http_auth=...)"
+    change_type: renamed
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "http_auth parameter renamed to basic_auth for client authentication"
+    replacement: "Elasticsearch(..., basic_auth=('user', 'password'))"
+    has_deterministic_transform: true
+    transform_name: http_auth_to_basic_auth
+
+  - symbol: "Elasticsearch(timeout=...)"
+    change_type: renamed
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "timeout parameter deprecated, renamed to request_timeout"
+    replacement: "Elasticsearch(..., request_timeout=30)"
+    has_deterministic_transform: true
+    transform_name: timeout_to_request_timeout
+
+  - symbol: "Elasticsearch(randomize_hosts=...)"
+    change_type: renamed
+    severity: low
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "randomize_hosts parameter renamed to randomize_nodes_in_pool"
+    replacement: "Elasticsearch(..., randomize_nodes_in_pool=True)"
+    has_deterministic_transform: true
+    transform_name: randomize_hosts_to_randomize_nodes
+
+  - symbol: "Elasticsearch(sniffer_timeout=...)"
+    change_type: renamed
+    severity: low
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "sniffer_timeout parameter renamed to min_delay_between_sniffing"
+    replacement: "Elasticsearch(..., min_delay_between_sniffing=60)"
+    has_deterministic_transform: true
+    transform_name: sniffer_timeout_to_min_delay
+
+  - symbol: "Elasticsearch(sniff_on_connection_fail=...)"
+    change_type: renamed
+    severity: low
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "sniff_on_connection_fail parameter renamed to sniff_on_node_failure"
+    replacement: "Elasticsearch(..., sniff_on_node_failure=True)"
+    has_deterministic_transform: true
+    transform_name: sniff_on_connection_fail_to_sniff_on_node_failure
+
+  - symbol: "Elasticsearch(maxsize=...)"
+    change_type: renamed
+    severity: low
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "maxsize parameter renamed to connections_per_node"
+    replacement: "Elasticsearch(..., connections_per_node=10)"
+    has_deterministic_transform: true
+    transform_name: maxsize_to_connections_per_node
+
+  - symbol: "Elasticsearch(host_info_callback=...)"
+    change_type: renamed
+    severity: low
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "host_info_callback parameter renamed to sniffed_node_callback"
+    replacement: "Elasticsearch(..., sniffed_node_callback=callback_func)"
+    has_deterministic_transform: true
+    transform_name: host_info_callback_to_sniffed_node_callback
+
+  # Host dictionary configuration changes
+  - symbol: "hosts={'use_ssl': True}"
+    change_type: removed
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "use_ssl key in hosts dictionary removed, use https:// scheme instead"
+    replacement: "hosts='https://localhost:9200' or hosts={'scheme': 'https', 'host': 'localhost', 'port': 9200}"
+    has_deterministic_transform: false
+    notes: "Scheme specification (http or https) has been required since 8.0"
+
+  - symbol: "hosts={'url_prefix': '...'}"
+    change_type: renamed
+    severity: low
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "url_prefix key in hosts dictionary renamed to path_prefix"
+    replacement: "hosts={'scheme': 'https', 'host': 'localhost', 'port': 9200, 'path_prefix': '/elasticsearch'}"
+    has_deterministic_transform: false
+    notes: "Used when Elasticsearch is deployed under a specific path"
+
+  # Per-request options changes
+  - symbol: "client.search(api_key=...)"
+    change_type: moved
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "api_key parameter removed from API methods, must use client.options() instead"
+    replacement: "client.options(api_key='api_key').search(...)"
+    has_deterministic_transform: false
+    notes: "Applies to all API methods that previously accepted api_key"
+
+  - symbol: "client.search(http_auth=...)"
+    change_type: moved
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "http_auth parameter removed from API methods, must use client.options(basic_auth=...) instead"
+    replacement: "client.options(basic_auth=('user', 'password')).search(...)"
+    has_deterministic_transform: false
+    notes: "Applies to all API methods that previously accepted http_auth"
+
+  - symbol: "client.search(request_timeout=...)"
+    change_type: moved
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "request_timeout parameter should be specified via client.options() for per-request timeouts"
+    replacement: "client.options(request_timeout=30).search(...)"
+    has_deterministic_transform: false
+    notes: "Per-request options now use the options() pattern"
+
+  - symbol: "client.indices.delete(ignore=404)"
+    change_type: moved
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "ignore parameter removed from API methods, use client.options(ignore_status=...) instead"
+    replacement: "client.options(ignore_status=404).indices.delete(index='my-index')"
+    has_deterministic_transform: false
+    notes: "Applies to all API methods that previously accepted ignore parameter"
+
+  - symbol: "client.search(headers=...)"
+    change_type: moved
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "headers parameter removed from API methods, use client.options(headers=...) instead"
+    replacement: "client.options(headers={'X-Custom': 'value'}).search(...)"
+    has_deterministic_transform: false
+    notes: "Applies to all API methods that previously accepted headers"
+
+  - symbol: "client.search(opaque_id=...)"
+    change_type: moved
+    severity: low
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "opaque_id parameter removed from API methods, use client.options(opaque_id=...) instead"
+    replacement: "client.options(opaque_id='request-1').search(...)"
+    has_deterministic_transform: false
+    notes: "Applies to all API methods that previously accepted opaque_id"
+
+  # API argument changes
+  - symbol: "client.indices.get('*')"
+    change_type: behavior_changed
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "Positional arguments no longer allowed, all parameters must be keyword arguments"
+    replacement: "client.indices.get(index='*')"
+    has_deterministic_transform: false
+    notes: "Applies to all API methods - positional arguments now raise TypeError"
+
+  - symbol: "client.search(body={...})"
+    change_type: deprecated
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "body parameter deprecated, request body fields should be passed as top-level keyword arguments"
+    replacement: "client.search(index='my-index', query={'match_all': {}})"
+    has_deterministic_transform: false
+    notes: "Use query=, aggs=, size=, from_= etc. instead of body={'query': ..., 'aggs': ...}"
+
+  - symbol: "client.index(body={...})"
+    change_type: renamed
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "body parameter renamed to document for the index API"
+    replacement: "client.index(index='my-index', document={'field': 'value'})"
+    has_deterministic_transform: true
+    transform_name: index_body_to_document
+
+  # Response object changes
+  - symbol: "isinstance(response, dict)"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "API responses are now ObjectApiResponse objects instead of plain dicts"
+    replacement: "response.body for dict, response['key'] still works for item access"
+    has_deterministic_transform: false
+    notes: "ObjectApiResponse provides dict-like access but also response.meta.status for HTTP status"
+
+  - symbol: "response.meta"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "Response metadata now accessible via response.meta attribute"
+    replacement: "response.meta.status for HTTP status code, response.meta.headers for headers"
+    has_deterministic_transform: false
+    notes: "New in v8 - provides access to HTTP response metadata"
+
+  # Exception hierarchy changes
+  - symbol: "except TransportError"
+    change_type: behavior_changed
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "TransportError no longer catches API errors like NotFoundError, only transport-level errors"
+    replacement: "except (ApiError, TransportError) to catch both API and transport errors"
+    has_deterministic_transform: false
+    notes: "Use ApiError for HTTP status errors (404, 400, etc.), TransportError for connection issues"
+
+  - symbol: "elasticsearch.ElasticsearchException"
+    change_type: removed
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "ElasticsearchException base class removed from exception hierarchy"
+    replacement: "Use ApiError and TransportError instead"
+    has_deterministic_transform: false
+    notes: "No single base exception class exists anymore"
+
+  - symbol: "err.status_code"
+    change_type: moved
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "Exception status_code attribute moved to err.meta.status"
+    replacement: "err.meta.status"
+    has_deterministic_transform: true
+    transform_name: error_status_code_to_meta_status
+
+  - symbol: "err.info"
+    change_type: renamed
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "Exception info attribute renamed to err.body"
+    replacement: "err.body"
+    has_deterministic_transform: true
+    transform_name: error_info_to_body
+
+  # Removed APIs
+  - symbol: "client.knn_search()"
+    change_type: removed
+    severity: medium
+    from_version: "8.0"
+    to_version: "8.4"
+    description: "Standalone kNN search API removed, use knn parameter in search API instead"
+    replacement: "client.search(index='my-index', knn={'field': 'vec', 'query_vector': [...], 'k': 10})"
+    has_deterministic_transform: false
+    notes: "knn option in search API available since Elasticsearch 8.4"
+
+  - symbol: "client.indices.unfreeze()"
+    change_type: removed
+    severity: low
+    from_version: "7.14"
+    to_version: "8.0"
+    description: "Unfreeze index API deprecated in 7.14 and removed"
+    replacement: "Frozen indices feature deprecated, no direct replacement"
+    has_deterministic_transform: false
+    notes: "Frozen indices are deprecated in favor of searchable snapshots"
+
+  # Import changes
+  - symbol: "from elasticsearch import TransportError"
+    change_type: behavior_changed
+    severity: high
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "TransportError import location and behavior changed"
+    replacement: "from elasticsearch import TransportError, ApiError"
+    has_deterministic_transform: false
+    notes: "Import both for comprehensive error handling"
+
+  - symbol: "from elasticsearch.exceptions import NotFoundError"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "NotFoundError now inherits from ApiError instead of TransportError"
+    replacement: "except ApiError or except NotFoundError"
+    has_deterministic_transform: false
+    notes: "All HTTP status errors (NotFoundError, ConflictError, etc.) now inherit from ApiError"
+
+  # Async client changes
+  - symbol: "from elasticsearch import AsyncElasticsearch"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "AsyncElasticsearch has same breaking changes as sync client"
+    replacement: "All sync client changes apply to AsyncElasticsearch"
+    has_deterministic_transform: false
+    notes: "Requires aiohttp: pip install elasticsearch[async]"
+
+  # Helpers changes
+  - symbol: "helpers.bulk(es, actions, doc_type=...)"
+    change_type: removed
+    severity: medium
+    from_version: "7.0"
+    to_version: "8.0"
+    description: "doc_type parameter removed from bulk helpers as document types are removed in Elasticsearch 8"
+    replacement: "helpers.bulk(es, actions) without doc_type"
+    has_deterministic_transform: true
+    transform_name: bulk_remove_doc_type
+    notes: "Document types (_type) were deprecated in ES 7.x and removed in ES 8.x"

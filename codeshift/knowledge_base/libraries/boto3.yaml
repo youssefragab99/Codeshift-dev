@@ -1,0 +1,411 @@
+# Boto3 Knowledge Base
+# Breaking changes from boto 2.x to boto3, and internal boto3/botocore version changes
+
+name: boto3
+display_name: Boto3 (AWS SDK for Python)
+description: AWS SDK for Python providing low-level and high-level interfaces to AWS services
+migration_guide_url: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/migration.html
+
+supported_migrations:
+  - from: "boto2"
+    to: "boto3"
+  - from: "1.8"
+    to: "1.9"
+  - from: "1.3"
+    to: "1.4"
+
+breaking_changes:
+  # =====================================================
+  # Boto 2.x to Boto3 Migration - Connection/Client Changes
+  # =====================================================
+  - symbol: "boto.connect_s3"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Connection-based API replaced with resource/client model"
+    replacement: "boto3.resource('s3') or boto3.client('s3')"
+    has_deterministic_transform: true
+    transform_name: connect_s3_to_resource
+    notes: "Boto3 uses a unified client/resource model instead of per-service connection classes"
+
+  - symbol: "boto.connect_ec2"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "EC2 connection class replaced with resource/client model"
+    replacement: "boto3.resource('ec2') or boto3.client('ec2')"
+    has_deterministic_transform: true
+    transform_name: connect_ec2_to_resource
+    notes: "vpc_connection methods are also now part of ec2 resource"
+
+  - symbol: "boto.connect_dynamodb"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "DynamoDB connection class replaced with resource/client model"
+    replacement: "boto3.resource('dynamodb') or boto3.client('dynamodb')"
+    has_deterministic_transform: true
+    transform_name: connect_dynamodb_to_resource
+
+  - symbol: "boto.connect_sqs"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "SQS connection class replaced with resource/client model"
+    replacement: "boto3.resource('sqs') or boto3.client('sqs')"
+    has_deterministic_transform: true
+    transform_name: connect_sqs_to_resource
+
+  # =====================================================
+  # S3 Method Changes (Boto 2.x to Boto3)
+  # =====================================================
+  - symbol: "Key.set_contents_from_file"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Key upload method replaced with Object.put() or upload_file()"
+    replacement: "s3.Object(bucket, key).put(Body=open(path, 'rb'))"
+    has_deterministic_transform: false
+    notes: "Use upload_file() for files, put() for in-memory data"
+
+  - symbol: "Key.set_contents_from_string"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Key string upload method replaced with Object.put()"
+    replacement: "s3.Object(bucket, key).put(Body=string_data)"
+    has_deterministic_transform: true
+    transform_name: set_contents_from_string_to_put
+
+  - symbol: "Key.get_contents_to_file"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Key download method replaced with download_file()"
+    replacement: "s3.Object(bucket, key).download_file(path)"
+    has_deterministic_transform: false
+    notes: "Use download_file() for files, get()['Body'].read() for in-memory"
+
+  - symbol: "Key.get_contents_as_string"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Key string download method replaced with get()"
+    replacement: "s3.Object(bucket, key).get()['Body'].read()"
+    has_deterministic_transform: true
+    transform_name: get_contents_as_string_to_get
+
+  - symbol: "Key.set_metadata"
+    change_type: removed
+    severity: medium
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Metadata is now set via put() Metadata parameter"
+    replacement: "s3.Object(bucket, key).put(Metadata={'key': 'value'})"
+    has_deterministic_transform: false
+    notes: "Metadata must be set during upload, not after"
+
+  - symbol: "Key.get_metadata"
+    change_type: removed
+    severity: medium
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Metadata accessed via object.metadata attribute"
+    replacement: "s3.Object(bucket, key).metadata['key']"
+    has_deterministic_transform: true
+    transform_name: get_metadata_to_attribute
+
+  - symbol: "Bucket.get_all_keys"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Bucket iteration replaced with objects collection"
+    replacement: "bucket.objects.all()"
+    has_deterministic_transform: true
+    transform_name: get_all_keys_to_objects_all
+
+  - symbol: "connection.get_all_buckets"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Bucket listing replaced with buckets collection"
+    replacement: "s3.buckets.all()"
+    has_deterministic_transform: true
+    transform_name: get_all_buckets_to_buckets_all
+
+  - symbol: "Bucket.lookup"
+    change_type: removed
+    severity: medium
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Bucket existence check replaced with head_bucket"
+    replacement: "s3.meta.client.head_bucket(Bucket='name')"
+    has_deterministic_transform: false
+    notes: "Wrap in try/except to handle non-existent buckets"
+
+  - symbol: "Bucket.set_acl"
+    change_type: removed
+    severity: medium
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "ACL setting method changed to Acl() subresource"
+    replacement: "bucket.Acl().put(ACL='public-read')"
+    has_deterministic_transform: true
+    transform_name: set_acl_to_acl_put
+
+  - symbol: "Bucket.get_acl"
+    change_type: removed
+    severity: medium
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "ACL access changed to Acl() subresource"
+    replacement: "bucket.Acl()"
+    has_deterministic_transform: true
+    transform_name: get_acl_to_acl
+
+  # =====================================================
+  # EC2 Method Changes (Boto 2.x to Boto3)
+  # =====================================================
+  - symbol: "ec2_connection.run_instances"
+    change_type: renamed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "run_instances() replaced with create_instances() on resource"
+    replacement: "ec2.create_instances(ImageId='ami-xxx', MinCount=1, MaxCount=1)"
+    has_deterministic_transform: false
+    notes: "Parameters must use UpperCamelCase in boto3"
+
+  - symbol: "ec2_connection.get_all_reservations"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Reservation listing replaced with instances.filter()"
+    replacement: "ec2.instances.filter(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])"
+    has_deterministic_transform: false
+    notes: "No longer returns reservations, directly returns instances"
+
+  - symbol: "ec2_connection.get_all_instances"
+    change_type: removed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Instance listing replaced with instances collection"
+    replacement: "ec2.instances.all() or ec2.instances.filter(...)"
+    has_deterministic_transform: true
+    transform_name: get_all_instances_to_instances_all
+
+  - symbol: "ec2_connection.stop_instances"
+    change_type: removed
+    severity: medium
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Bulk stop replaced with filter().stop()"
+    replacement: "ec2.instances.filter(InstanceIds=ids).stop()"
+    has_deterministic_transform: true
+    transform_name: stop_instances_to_filter_stop
+
+  - symbol: "ec2_connection.terminate_instances"
+    change_type: removed
+    severity: medium
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Bulk terminate replaced with filter().terminate()"
+    replacement: "ec2.instances.filter(InstanceIds=ids).terminate()"
+    has_deterministic_transform: true
+    transform_name: terminate_instances_to_filter_terminate
+
+  - symbol: "ec2_connection.get_all_instance_statuses"
+    change_type: removed
+    severity: medium
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "Instance status requires client interface"
+    replacement: "ec2.meta.client.describe_instance_status()['InstanceStatuses']"
+    has_deterministic_transform: false
+    notes: "No resource equivalent, must use low-level client"
+
+  # =====================================================
+  # DynamoDB Changes
+  # =====================================================
+  - symbol: "Table.scan(attributes_to_get=...)"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.9"
+    description: "AttributesToGet is a legacy parameter"
+    replacement: "Table.scan(ProjectionExpression='attr1, attr2')"
+    has_deterministic_transform: false
+    notes: "Use ProjectionExpression with ExpressionAttributeNames for reserved words"
+
+  - symbol: "Table.scan(conditional_operator=...)"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.9"
+    description: "ConditionalOperator is a legacy parameter"
+    replacement: "Table.scan(FilterExpression=...)"
+    has_deterministic_transform: false
+    notes: "Use FilterExpression with Attr() conditions"
+
+  - symbol: "Table.query(attributes_to_get=...)"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.9"
+    description: "AttributesToGet is a legacy parameter"
+    replacement: "Table.query(ProjectionExpression='attr1, attr2')"
+    has_deterministic_transform: false
+    notes: "Use ProjectionExpression with ExpressionAttributeNames for reserved words"
+
+  # =====================================================
+  # Boto3 1.9.0 - Event System Changes
+  # =====================================================
+  - symbol: "events.register('autoscaling.*')"
+    change_type: behavior_changed
+    severity: high
+    from_version: "1.8"
+    to_version: "1.9"
+    description: "Event system changed from endpoint prefix to service ID"
+    replacement: "events.register('application-auto-scaling.*') for Application Auto Scaling"
+    has_deterministic_transform: false
+    notes: "Use client.meta.service_model.service_id.hyphenize() to get correct event name"
+
+  - symbol: "events.register('elasticloadbalancing.*')"
+    change_type: behavior_changed
+    severity: high
+    from_version: "1.8"
+    to_version: "1.9"
+    description: "Event name changed for ELBv2"
+    replacement: "events.register('elastic-load-balancing.*') for ELBv2"
+    has_deterministic_transform: false
+    notes: "Classic ELB still uses 'elb', but ELBv2 uses 'elastic-load-balancing'"
+
+  - symbol: "events.register('kinesisvideo.*')"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.8"
+    to_version: "1.9"
+    description: "Event name changed for Kinesis Video variants"
+    replacement: "events.register('kinesis-video-archived-media.*')"
+    has_deterministic_transform: false
+    notes: "Kinesis Video Media and Archived Media now have separate event names"
+
+  # =====================================================
+  # Boto3 1.4.0 - S3 Transfer Module Changes
+  # =====================================================
+  - symbol: "boto3.s3.transfer.MultipartUploader"
+    change_type: removed
+    severity: medium
+    from_version: "1.3"
+    to_version: "1.4"
+    description: "Internal MultipartUploader class removed in s3transfer integration"
+    replacement: "Use upload_fileobj() with TransferConfig for multipart control"
+    has_deterministic_transform: false
+    notes: "Public API (S3Transfer, TransferConfig) unchanged"
+
+  - symbol: "boto3.s3.transfer.MultipartDownloader"
+    change_type: removed
+    severity: medium
+    from_version: "1.3"
+    to_version: "1.4"
+    description: "Internal MultipartDownloader class removed in s3transfer integration"
+    replacement: "Use download_fileobj() with TransferConfig for multipart control"
+    has_deterministic_transform: false
+    notes: "Public API unchanged"
+
+  - symbol: "boto3.s3.transfer.ReadFileChunk"
+    change_type: removed
+    severity: low
+    from_version: "1.3"
+    to_version: "1.4"
+    description: "Internal ReadFileChunk class removed"
+    replacement: "No direct replacement, use public transfer APIs"
+    has_deterministic_transform: false
+    notes: "Internal implementation detail"
+
+  - symbol: "OSUtils.open_file_chunk_reader"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.3"
+    to_version: "1.4"
+    description: "open_file_chunk_reader no longer called during uploads"
+    replacement: "Use upload_fileobj() and download_fileobj() for file-like objects"
+    has_deterministic_transform: false
+    notes: "New methods support both multipart and non-multipart transfers"
+
+  # =====================================================
+  # Parameter Naming Convention Changes
+  # =====================================================
+  - symbol: "positional_arguments"
+    change_type: behavior_changed
+    severity: high
+    from_version: "boto2"
+    to_version: "boto3"
+    description: "All API parameters must be keyword arguments with UpperCamelCase"
+    replacement: "Use keyword arguments: client.method(ParamName='value')"
+    has_deterministic_transform: false
+    notes: "Boto3 follows AWS API naming conventions exactly"
+
+  # =====================================================
+  # Resource Interface Feature Freeze
+  # =====================================================
+  - symbol: "boto3.resource"
+    change_type: deprecated
+    severity: low
+    from_version: "1.26"
+    to_version: "1.28"
+    description: "Resource interface is feature-frozen, no new features will be added"
+    replacement: "boto3.client() for access to newer service features"
+    has_deterministic_transform: false
+    notes: "Existing resource code will continue to work, but new AWS features may only be available via client"
+
+  # =====================================================
+  # urllib3 Compatibility (botocore)
+  # =====================================================
+  - symbol: "urllib3<2"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.26.0"
+    to_version: "1.26.123"
+    description: "urllib3 2.x support added for Python 3.10+"
+    replacement: "Pin urllib3<2 for Python 3.9 or earlier"
+    has_deterministic_transform: false
+    notes: "Lambda with Python 3.9 runtime requires explicit urllib3<2 pin"
+
+  # =====================================================
+  # Python 2 End of Support
+  # =====================================================
+  - symbol: "python2_support"
+    change_type: removed
+    severity: high
+    from_version: "1.17"
+    to_version: "1.18"
+    description: "Python 2.7 support ended July 15, 2021"
+    replacement: "Migrate to Python 3.7+"
+    has_deterministic_transform: false
+    notes: "All projects using boto3 must use Python 3"
+
+  # =====================================================
+  # Signature Version Changes
+  # =====================================================
+  - symbol: "s3_signature_version"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.9"
+    description: "S3 now uses Signature Version 4 by default for most regions"
+    replacement: "Configure signature_version='s3v4' explicitly if needed"
+    has_deterministic_transform: false
+    notes: "Some older regions may still default to v2, explicit v4 recommended"

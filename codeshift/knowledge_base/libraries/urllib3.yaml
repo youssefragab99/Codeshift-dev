@@ -1,0 +1,342 @@
+# urllib3 Knowledge Base
+# Breaking changes from v1.x to v2.x
+
+name: urllib3
+display_name: urllib3
+description: HTTP client library for Python with thread safety and connection pooling
+migration_guide_url: https://urllib3.readthedocs.io/en/stable/v2-migration-guide.html
+
+supported_migrations:
+  - from: "1.26"
+    to: "2.0"
+
+breaking_changes:
+  # SSL/TLS parameter changes
+  - symbol: "ssl_version"
+    change_type: removed
+    severity: high
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "ssl_version parameter removed from HTTPSConnectionPool and related classes"
+    replacement: "Use ssl_minimum_version=ssl.TLSVersion.TLSv1_2 instead"
+    has_deterministic_transform: true
+    transform_name: ssl_version_to_ssl_minimum_version
+    notes: "ssl_minimum_version accepts ssl.TLSVersion enum values"
+
+  - symbol: "HTTPSConnectionPool(ssl_version=...)"
+    change_type: removed
+    severity: high
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "ssl_version parameter removed, use ssl_minimum_version"
+    replacement: "HTTPSConnectionPool(ssl_minimum_version=ssl.TLSVersion.TLSv1_2)"
+    has_deterministic_transform: true
+    transform_name: pool_ssl_version_to_ssl_minimum_version
+
+  # Retry configuration changes
+  - symbol: "Retry(method_whitelist=...)"
+    change_type: renamed
+    severity: high
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "method_whitelist parameter renamed to allowed_methods"
+    replacement: "Retry(allowed_methods=...)"
+    has_deterministic_transform: true
+    transform_name: retry_method_whitelist_to_allowed_methods
+
+  - symbol: "Retry.DEFAULT_REDIRECT_HEADERS_BLACKLIST"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "DEFAULT_REDIRECT_HEADERS_BLACKLIST constant removed"
+    replacement: "Use Retry.DEFAULT_REMOVE_HEADERS_ON_REDIRECT instead"
+    has_deterministic_transform: true
+    transform_name: retry_blacklist_to_remove_headers
+
+  # Removed modules
+  - symbol: "urllib3.contrib.ntlmpool"
+    change_type: removed
+    severity: high
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "NTLMConnectionPool module completely removed"
+    replacement: "Use requests-ntlm or httpx-ntlm packages for NTLM authentication"
+    has_deterministic_transform: false
+    notes: "No direct replacement in urllib3, requires external library"
+
+  - symbol: "urllib3.contrib.securetransport"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "SecureTransport module for macOS removed"
+    replacement: "Use default OpenSSL-based SSL handling"
+    has_deterministic_transform: false
+    notes: "macOS now uses OpenSSL like other platforms"
+
+  - symbol: "urllib3.contrib.appengine"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "AppEngineManager and Google App Engine Standard Environment support removed"
+    replacement: "Use standard urllib3.PoolManager"
+    has_deterministic_transform: false
+    notes: "Google App Engine no longer requires special handling"
+
+  - symbol: "urllib3.request"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "urllib3.request module removed"
+    replacement: "Use urllib3.request() function directly"
+    has_deterministic_transform: true
+    transform_name: request_module_to_function
+
+  # HTTPResponse changes
+  - symbol: "HTTPResponse.getheaders()"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "getheaders() method removed from HTTPResponse"
+    replacement: "response.headers.items()"
+    has_deterministic_transform: true
+    transform_name: getheaders_to_headers_items
+
+  - symbol: "HTTPResponse.getheader()"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "getheader(name) method removed from HTTPResponse"
+    replacement: "response.headers.get(name) or response.headers[name]"
+    has_deterministic_transform: true
+    transform_name: getheader_to_headers_get
+
+  - symbol: "HTTPResponse.strict"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "strict parameter removed from HTTPResponse"
+    replacement: "Remove the strict parameter entirely"
+    has_deterministic_transform: true
+    transform_name: remove_strict_parameter
+
+  - symbol: "HTTPResponse.from_httplib"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "from_httplib class method removed from HTTPResponse"
+    replacement: "Use urllib3.HTTPResponse directly"
+    has_deterministic_transform: false
+    notes: "Internal API, manual migration required"
+
+  # Connection pool changes
+  - symbol: "HTTPConnectionPool._prepare_conn"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "_prepare_conn method removed from HTTPConnectionPool"
+    replacement: "Override _get_conn method instead"
+    has_deterministic_transform: false
+    notes: "Internal API change, affects custom connection pool implementations"
+
+  - symbol: "HTTPSConnection.tls_in_tls_required"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "tls_in_tls_required property removed from HTTPSConnection"
+    replacement: "No direct replacement, handled internally"
+    has_deterministic_transform: false
+
+  - symbol: "HTTPSConnection.set_cert()"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "set_cert() method removed from HTTPSConnection"
+    replacement: "Pass cert parameters to HTTPSConnectionPool constructor"
+    has_deterministic_transform: false
+    notes: "Certificate configuration moved to pool initialization"
+
+  - symbol: "HTTPConnection.request_chunked()"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "request_chunked() method removed from HTTPConnection"
+    replacement: "Use request() method with chunked encoding"
+    has_deterministic_transform: false
+
+  # SSL utilities removed
+  - symbol: "urllib3.util.ssl_.DEFAULT_CIPHERS"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "DEFAULT_CIPHERS constant removed from ssl_ module"
+    replacement: "Use system-configured ciphers (no explicit cipher list needed)"
+    has_deterministic_transform: true
+    transform_name: remove_default_ciphers_import
+
+  - symbol: "urllib3.util.ssl_.HAS_SNI"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "HAS_SNI constant removed (SNI is always required)"
+    replacement: "Remove HAS_SNI checks, SNI is always available in Python 3.7+"
+    has_deterministic_transform: true
+    transform_name: remove_has_sni_check
+
+  - symbol: "urllib3.exceptions.SNIMissingWarning"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "SNIMissingWarning exception removed"
+    replacement: "Remove exception handling for SNIMissingWarning"
+    has_deterministic_transform: true
+    transform_name: remove_sni_warning_import
+
+  # Import path changes
+  - symbol: "from urllib3.connectionpool import VerifiedHTTPSConnection"
+    change_type: moved
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "VerifiedHTTPSConnection moved and renamed to HTTPSConnection in connection module"
+    replacement: "from urllib3.connection import HTTPSConnection"
+    has_deterministic_transform: true
+    transform_name: verified_https_connection_import_fix
+
+  # Encoding behavior change
+  - symbol: "request body encoding"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "Default request body encoding changed from ISO-8859-1 to UTF-8"
+    replacement: "Explicitly encode body with ISO-8859-1 if legacy encoding is required"
+    has_deterministic_transform: false
+    notes: "May affect non-ASCII request bodies"
+
+  # TLS behavior changes
+  - symbol: "TLS minimum version"
+    change_type: behavior_changed
+    severity: high
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "Default minimum TLS version changed from TLS 1.0 to TLS 1.2"
+    replacement: "Set ssl_minimum_version=ssl.TLSVersion.TLSv1 if legacy TLS is required"
+    has_deterministic_transform: false
+    notes: "Connections to servers not supporting TLS 1.2 will fail by default"
+
+  - symbol: "certificate commonName verification"
+    change_type: removed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "Certificate hostname verification via commonName removed"
+    replacement: "Ensure server certificates use subjectAltName for hostnames"
+    has_deterministic_transform: false
+    notes: "subjectAltName is the only hostname verification method supported"
+
+  # RequestField changes
+  - symbol: "RequestField.header_formatter"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "header_formatter parameter removed from RequestField"
+    replacement: "Remove header_formatter parameter"
+    has_deterministic_transform: true
+    transform_name: remove_header_formatter_param
+
+  - symbol: "format_header_param"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "format_header_param function removed"
+    replacement: "Use standard header formatting"
+    has_deterministic_transform: false
+
+  - symbol: "format_header_param_html5"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "format_header_param_html5 function removed"
+    replacement: "Use standard header formatting"
+    has_deterministic_transform: false
+
+  # Pool manager changes
+  - symbol: "PoolManager.connection_from_pool_key(request_context=None)"
+    change_type: behavior_changed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "Default None value for request_context parameter removed"
+    replacement: "Always pass explicit request_context"
+    has_deterministic_transform: false
+
+  - symbol: "PoolManager.connection_from_context(strict=...)"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "strict parameter removed from connection_from_context"
+    replacement: "Remove strict parameter from method calls"
+    has_deterministic_transform: true
+    transform_name: remove_context_strict_param
+
+  # Exception changes
+  - symbol: "NewConnectionError.pool"
+    change_type: removed
+    severity: low
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "pool attribute removed from NewConnectionError"
+    replacement: "Access pool information from exception message or context"
+    has_deterministic_transform: false
+
+  # HTTPResponse.read() behavior change
+  - symbol: "HTTPResponse.read()"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "read() now respects io.BufferedIOBase semantics regardless of compression"
+    replacement: "Review code that relies on previous read() behavior with compressed responses"
+    has_deterministic_transform: false
+    notes: "May affect streaming and chunked response handling"
+
+  # Content length enforcement
+  - symbol: "HTTPResponse(enforce_content_length=False)"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "Default enforce_content_length changed from False to True"
+    replacement: "Explicitly set enforce_content_length=False if needed for legacy behavior"
+    has_deterministic_transform: false
+    notes: "Prevents silent data loss from truncated responses"
+
+  # Connection return type change
+  - symbol: "HTTPConnection.getresponse()"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.26"
+    to_version: "2.0"
+    description: "getresponse() now returns urllib3.HTTPResponse instead of http.client.HTTPResponse"
+    replacement: "Update code expecting http.client.HTTPResponse type"
+    has_deterministic_transform: false
+    notes: "urllib3.HTTPResponse has different attributes and methods"

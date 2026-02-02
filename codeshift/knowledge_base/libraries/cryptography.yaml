@@ -1,0 +1,326 @@
+# Cryptography Knowledge Base
+# Breaking changes from v38.0 to v47.0+
+
+name: cryptography
+display_name: Cryptography
+description: Python library providing cryptographic recipes and primitives
+migration_guide_url: https://cryptography.io/en/latest/changelog/
+
+supported_migrations:
+  - from: "38.0"
+    to: "47.0"
+  - from: "41.0"
+    to: "47.0"
+  - from: "42.0"
+    to: "47.0"
+  - from: "43.0"
+    to: "47.0"
+
+breaking_changes:
+  # Backend deprecations
+  - symbol: "cryptography.hazmat.backends.default_backend"
+    change_type: deprecated
+    severity: medium
+    from_version: "36.0"
+    to_version: "41.0"
+    description: "default_backend() is deprecated and no longer needed; backend parameter silently ignored"
+    replacement: "Remove backend parameter from function calls"
+    has_deterministic_transform: true
+    transform_name: remove_backend_parameter
+    notes: "Functions that previously required backend= now work without it"
+
+  # Cipher deprecations and removals
+  - symbol: "cryptography.hazmat.primitives.ciphers.algorithms.Blowfish"
+    change_type: moved
+    severity: high
+    from_version: "42.0"
+    to_version: "45.0"
+    description: "Blowfish cipher deprecated and moved to decrepit module"
+    replacement: "cryptography.hazmat.decrepit.ciphers.algorithms.Blowfish"
+    has_deterministic_transform: true
+    transform_name: blowfish_to_decrepit
+    notes: "Legacy algorithm with low usage; consider using AES instead"
+
+  - symbol: "cryptography.hazmat.primitives.ciphers.algorithms.CAST5"
+    change_type: moved
+    severity: high
+    from_version: "42.0"
+    to_version: "45.0"
+    description: "CAST5 cipher deprecated and moved to decrepit module"
+    replacement: "cryptography.hazmat.decrepit.ciphers.algorithms.CAST5"
+    has_deterministic_transform: true
+    transform_name: cast5_to_decrepit
+    notes: "Legacy algorithm; consider using AES instead"
+
+  - symbol: "cryptography.hazmat.primitives.ciphers.algorithms.SEED"
+    change_type: moved
+    severity: high
+    from_version: "42.0"
+    to_version: "45.0"
+    description: "SEED cipher deprecated and moved to decrepit module"
+    replacement: "cryptography.hazmat.decrepit.ciphers.algorithms.SEED"
+    has_deterministic_transform: true
+    transform_name: seed_to_decrepit
+    notes: "Legacy algorithm; consider using AES instead"
+
+  - symbol: "cryptography.hazmat.primitives.ciphers.algorithms.IDEA"
+    change_type: moved
+    severity: high
+    from_version: "42.0"
+    to_version: "45.0"
+    description: "IDEA cipher deprecated and moved to decrepit module"
+    replacement: "cryptography.hazmat.decrepit.ciphers.algorithms.IDEA"
+    has_deterministic_transform: true
+    transform_name: idea_to_decrepit
+    notes: "Legacy algorithm; consider using AES instead"
+
+  - symbol: "cryptography.hazmat.primitives.ciphers.algorithms.TripleDES"
+    change_type: deprecated
+    severity: high
+    from_version: "43.0"
+    to_version: "48.0"
+    description: "TripleDES cipher deprecated; will be removed in v48.0.0"
+    replacement: "cryptography.hazmat.decrepit.ciphers.algorithms.TripleDES or use AES"
+    has_deterministic_transform: true
+    transform_name: tripledes_to_decrepit
+    notes: "64-bit and 128-bit keys deprecated in v47; only 192-bit keys supported going forward"
+
+  - symbol: "cryptography.hazmat.primitives.ciphers.algorithms.ARC4"
+    change_type: deprecated
+    severity: high
+    from_version: "43.0"
+    to_version: "48.0"
+    description: "ARC4 (RC4) stream cipher deprecated; will be removed in v48.0.0"
+    replacement: "cryptography.hazmat.decrepit.ciphers.algorithms.ARC4 or use AES-GCM"
+    has_deterministic_transform: true
+    transform_name: arc4_to_decrepit
+    notes: "RC4 has known weaknesses; use authenticated encryption instead"
+
+  - symbol: "cryptography.hazmat.primitives.ciphers.algorithms.Camellia"
+    change_type: moved
+    severity: medium
+    from_version: "47.0"
+    to_version: "49.0"
+    description: "Camellia cipher moved to decrepit module; removal from main module in v49.0.0"
+    replacement: "cryptography.hazmat.decrepit.ciphers.algorithms.Camellia"
+    has_deterministic_transform: true
+    transform_name: camellia_to_decrepit
+    notes: "Consider using AES instead for better support"
+
+  # Cipher modes deprecations
+  - symbol: "cryptography.hazmat.primitives.ciphers.modes.CFB"
+    change_type: moved
+    severity: medium
+    from_version: "47.0"
+    to_version: "49.0"
+    description: "CFB mode moved to decrepit module; removal from main module in v49.0.0"
+    replacement: "cryptography.hazmat.decrepit.ciphers.modes.CFB or use GCM mode"
+    has_deterministic_transform: true
+    transform_name: cfb_mode_to_decrepit
+    notes: "Consider using authenticated encryption modes like GCM"
+
+  - symbol: "cryptography.hazmat.primitives.ciphers.modes.OFB"
+    change_type: moved
+    severity: medium
+    from_version: "47.0"
+    to_version: "49.0"
+    description: "OFB mode moved to decrepit module; removal from main module in v49.0.0"
+    replacement: "cryptography.hazmat.decrepit.ciphers.modes.OFB or use GCM mode"
+    has_deterministic_transform: true
+    transform_name: ofb_mode_to_decrepit
+    notes: "Consider using authenticated encryption modes like GCM"
+
+  - symbol: "cryptography.hazmat.primitives.ciphers.modes.CFB8"
+    change_type: moved
+    severity: medium
+    from_version: "47.0"
+    to_version: "49.0"
+    description: "CFB8 mode moved to decrepit module; removal from main module in v49.0.0"
+    replacement: "cryptography.hazmat.decrepit.ciphers.modes.CFB8 or use GCM mode"
+    has_deterministic_transform: true
+    transform_name: cfb8_mode_to_decrepit
+    notes: "Consider using authenticated encryption modes like GCM"
+
+  # DSA key deprecations
+  - symbol: "cryptography.hazmat.primitives.serialization.load_ssh_public_key"
+    change_type: behavior_changed
+    severity: high
+    from_version: "40.0"
+    to_version: "41.0"
+    description: "DSA keys deprecated in SSH key loading functions"
+    replacement: "Use RSA, ECDSA, or Ed25519 keys instead of DSA"
+    has_deterministic_transform: false
+    notes: "DSA keys are inherently weak (160-bit private key, SHA1 digest)"
+
+  - symbol: "cryptography.hazmat.primitives.serialization.load_ssh_private_key"
+    change_type: behavior_changed
+    severity: high
+    from_version: "40.0"
+    to_version: "41.0"
+    description: "DSA keys deprecated in SSH key loading functions"
+    replacement: "Use RSA, ECDSA, or Ed25519 keys instead of DSA"
+    has_deterministic_transform: false
+    notes: "DSA has been disabled by default in OpenSSH since 2015"
+
+  # X.509 datetime deprecations
+  - symbol: "Certificate.not_valid_before"
+    change_type: deprecated
+    severity: medium
+    from_version: "42.0"
+    to_version: "47.0"
+    description: "not_valid_before returns naive datetime; deprecated in favor of timezone-aware variant"
+    replacement: "Certificate.not_valid_before_utc"
+    has_deterministic_transform: true
+    transform_name: not_valid_before_to_utc
+    notes: "Returns datetime with timezone.utc tzinfo"
+
+  - symbol: "Certificate.not_valid_after"
+    change_type: deprecated
+    severity: medium
+    from_version: "42.0"
+    to_version: "47.0"
+    description: "not_valid_after returns naive datetime; deprecated in favor of timezone-aware variant"
+    replacement: "Certificate.not_valid_after_utc"
+    has_deterministic_transform: true
+    transform_name: not_valid_after_to_utc
+    notes: "Returns datetime with timezone.utc tzinfo"
+
+  - symbol: "RevokedCertificate.revocation_date"
+    change_type: deprecated
+    severity: medium
+    from_version: "42.0"
+    to_version: "47.0"
+    description: "revocation_date returns naive datetime; deprecated in favor of timezone-aware variant"
+    replacement: "RevokedCertificate.revocation_date_utc"
+    has_deterministic_transform: true
+    transform_name: revocation_date_to_utc
+    notes: "Returns datetime with timezone.utc tzinfo"
+
+  - symbol: "CertificateRevocationList.next_update"
+    change_type: deprecated
+    severity: medium
+    from_version: "42.0"
+    to_version: "47.0"
+    description: "next_update returns naive datetime; deprecated in favor of timezone-aware variant"
+    replacement: "CertificateRevocationList.next_update_utc"
+    has_deterministic_transform: true
+    transform_name: next_update_to_utc
+    notes: "Returns datetime with timezone.utc tzinfo"
+
+  - symbol: "CertificateRevocationList.last_update"
+    change_type: deprecated
+    severity: medium
+    from_version: "42.0"
+    to_version: "47.0"
+    description: "last_update returns naive datetime; deprecated in favor of timezone-aware variant"
+    replacement: "CertificateRevocationList.last_update_utc"
+    has_deterministic_transform: true
+    transform_name: last_update_to_utc
+    notes: "Returns datetime with timezone.utc tzinfo"
+
+  # CertificateSigningRequest changes
+  - symbol: "CertificateSigningRequest.get_attribute_for_oid"
+    change_type: removed
+    severity: medium
+    from_version: "41.0"
+    to_version: "46.0"
+    description: "get_attribute_for_oid method removed from CertificateSigningRequest"
+    replacement: "CertificateSigningRequest.attributes.get_attribute_for_oid(oid)"
+    has_deterministic_transform: true
+    transform_name: csr_get_attribute_for_oid
+    notes: "Access via the attributes property instead"
+
+  # Key serialization behavior changes
+  - symbol: "public_bytes"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "47.0"
+    to_version: "47.0"
+    description: "public_bytes now raises TypeError instead of ValueError for invalid encoding"
+    replacement: "Update exception handling from ValueError to TypeError"
+    has_deterministic_transform: false
+    notes: "Affects all key types: RSA, EC, Ed25519, etc."
+
+  - symbol: "private_bytes"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "47.0"
+    to_version: "47.0"
+    description: "private_bytes now raises TypeError instead of ValueError for invalid encoding"
+    replacement: "Update exception handling from ValueError to TypeError"
+    has_deterministic_transform: false
+    notes: "Affects all key types: RSA, EC, Ed25519, etc."
+
+  - symbol: "load_pem_private_key"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "45.0"
+    to_version: "47.0"
+    description: "SSH private key loading raises TypeError for password/encryption mismatch instead of ValueError"
+    replacement: "Update exception handling from ValueError to TypeError"
+    has_deterministic_transform: false
+    notes: "Applies when password provided for unencrypted key or vice versa"
+
+  - symbol: "load_der_private_key"
+    change_type: behavior_changed
+    severity: low
+    from_version: "47.0"
+    to_version: "47.0"
+    description: "Loading keys with unsupported algorithms raises UnsupportedAlgorithm instead of ValueError"
+    replacement: "Update exception handling to catch UnsupportedAlgorithm"
+    has_deterministic_transform: false
+    notes: "Import UnsupportedAlgorithm from cryptography.exceptions"
+
+  # EllipticCurvePublicNumbers changes (earlier but still relevant)
+  - symbol: "EllipticCurvePublicNumbers.encode_point"
+    change_type: removed
+    severity: high
+    from_version: "38.0"
+    to_version: "39.0"
+    description: "encode_point method removed from EllipticCurvePublicNumbers"
+    replacement: "Use public_key().public_bytes(Encoding.X962, PublicFormat.UncompressedPoint)"
+    has_deterministic_transform: false
+    notes: "Get the key first, then call public_bytes on it"
+
+  - symbol: "EllipticCurvePublicNumbers.from_encoded_point"
+    change_type: removed
+    severity: high
+    from_version: "38.0"
+    to_version: "39.0"
+    description: "from_encoded_point class method removed from EllipticCurvePublicNumbers"
+    replacement: "Use EllipticCurvePublicKey.from_encoded_point(curve, data)"
+    has_deterministic_transform: true
+    transform_name: ec_from_encoded_point
+    notes: "Method moved to EllipticCurvePublicKey class"
+
+  # Hash algorithm deprecations in X.509
+  - symbol: "x509.CertificateBuilder"
+    change_type: behavior_changed
+    severity: high
+    from_version: "38.0"
+    to_version: "39.0"
+    description: "MD5 and SHA1 signatures removed from X.509 certificate builders"
+    replacement: "Use SHA256 or stronger hash algorithms"
+    has_deterministic_transform: false
+    notes: "SHA1 and MD5 are cryptographically weak for signatures"
+
+  - symbol: "pkcs7.PKCS7SignatureBuilder"
+    change_type: behavior_changed
+    severity: high
+    from_version: "38.0"
+    to_version: "39.0"
+    description: "MD5 and SHA1 removed from PKCS7 signature builder"
+    replacement: "Use SHA256 or stronger hash algorithms"
+    has_deterministic_transform: false
+    notes: "SHA1 and MD5 are cryptographically weak for signatures"
+
+  # RSA key size enforcement
+  - symbol: "rsa.generate_private_key"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "43.0"
+    to_version: "43.0"
+    description: "Minimum RSA key size enforced at 1024 bits"
+    replacement: "Use key_size >= 1024 (recommended: 2048 or higher)"
+    has_deterministic_transform: false
+    notes: "Keys smaller than 1024 bits are cryptographically insecure"

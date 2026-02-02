@@ -1,0 +1,383 @@
+# SciPy Knowledge Base
+# Breaking changes from 1.0 to 1.14+
+
+name: scipy
+display_name: SciPy
+description: Fundamental algorithms for scientific computing in Python
+migration_guide_url: https://docs.scipy.org/doc/scipy/release.html
+
+supported_migrations:
+  - from: "1.0"
+    to: "1.14"
+
+breaking_changes:
+  # scipy.misc image function removals (removed in 1.2.0/1.3.0)
+  - symbol: "scipy.misc.imread"
+    change_type: removed
+    severity: high
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "scipy.misc.imread removed, use imageio.imread instead"
+    replacement: "imageio.imread()"
+    has_deterministic_transform: true
+    transform_name: misc_imread_to_imageio
+    notes: "Deprecated in 1.0.0, removed in 1.2.0. Requires installing imageio package."
+
+  - symbol: "scipy.misc.imsave"
+    change_type: removed
+    severity: high
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "scipy.misc.imsave removed, use imageio.imwrite instead"
+    replacement: "imageio.imwrite()"
+    has_deterministic_transform: true
+    transform_name: misc_imsave_to_imageio
+    notes: "Deprecated in 1.0.0, removed in 1.2.0. Requires installing imageio package."
+
+  - symbol: "scipy.misc.imresize"
+    change_type: removed
+    severity: high
+    from_version: "1.0"
+    to_version: "1.3"
+    description: "scipy.misc.imresize removed, use Pillow or skimage for resizing"
+    replacement: "numpy.array(Image.fromarray(arr).resize()) or skimage.transform.resize()"
+    has_deterministic_transform: false
+    notes: "Deprecated in 1.0.0, removed in 1.3.0. Requires Pillow or scikit-image."
+
+  # scipy.integrate function renames (deprecated 1.12.0, removed 1.14.0)
+  - symbol: "scipy.integrate.trapz"
+    change_type: renamed
+    severity: high
+    from_version: "1.6"
+    to_version: "1.14"
+    description: "scipy.integrate.trapz renamed to scipy.integrate.trapezoid"
+    replacement: "scipy.integrate.trapezoid()"
+    has_deterministic_transform: true
+    transform_name: trapz_to_trapezoid
+    notes: "Renamed in 1.6.0, deprecated in 1.12.0, removed in 1.14.0"
+
+  - symbol: "scipy.integrate.simps"
+    change_type: renamed
+    severity: high
+    from_version: "1.6"
+    to_version: "1.14"
+    description: "scipy.integrate.simps renamed to scipy.integrate.simpson"
+    replacement: "scipy.integrate.simpson()"
+    has_deterministic_transform: true
+    transform_name: simps_to_simpson
+    notes: "Renamed in 1.6.0, deprecated in 1.12.0, removed in 1.14.0"
+
+  - symbol: "scipy.integrate.cumtrapz"
+    change_type: renamed
+    severity: high
+    from_version: "1.6"
+    to_version: "1.14"
+    description: "scipy.integrate.cumtrapz renamed to scipy.integrate.cumulative_trapezoid"
+    replacement: "scipy.integrate.cumulative_trapezoid()"
+    has_deterministic_transform: true
+    transform_name: cumtrapz_to_cumulative_trapezoid
+    notes: "Renamed in 1.6.0, deprecated in 1.12.0, removed in 1.14.0"
+
+  - symbol: "scipy.integrate.simpson"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.11"
+    to_version: "1.14"
+    description: "The 'even' parameter of scipy.integrate.simpson has been removed"
+    replacement: "Remove 'even' parameter, use default behavior"
+    has_deterministic_transform: true
+    transform_name: simpson_remove_even
+    notes: "Deprecated in 1.11.0, removed in 1.14.0. New behavior uses parabolic segment for even points."
+
+  - symbol: "scipy.integrate.quadrature"
+    change_type: deprecated
+    severity: medium
+    from_version: "1.12"
+    to_version: "1.15"
+    description: "scipy.integrate.quadrature deprecated due to accuracy issues"
+    replacement: "scipy.integrate.quad()"
+    has_deterministic_transform: true
+    transform_name: quadrature_to_quad
+    notes: "Deprecated in 1.12.0, will be removed in 1.15.0"
+
+  - symbol: "scipy.integrate.romberg"
+    change_type: deprecated
+    severity: medium
+    from_version: "1.12"
+    to_version: "1.15"
+    description: "scipy.integrate.romberg deprecated due to accuracy issues"
+    replacement: "scipy.integrate.quad()"
+    has_deterministic_transform: true
+    transform_name: romberg_to_quad
+    notes: "Deprecated in 1.12.0, will be removed in 1.15.0"
+
+  # scipy.interpolate changes
+  - symbol: "scipy.interpolate.interp2d"
+    change_type: removed
+    severity: high
+    from_version: "1.10"
+    to_version: "1.14"
+    description: "scipy.interpolate.interp2d removed, use RegularGridInterpolator or RectBivariateSpline"
+    replacement: "scipy.interpolate.RegularGridInterpolator() or scipy.interpolate.RectBivariateSpline()"
+    has_deterministic_transform: false
+    notes: "Deprecated in 1.10.0, removed in 1.14.0. See scipy interp_transition_guide for migration details."
+
+  # scipy.stats changes
+  - symbol: "scipy.stats.binom_test"
+    change_type: removed
+    severity: high
+    from_version: "1.7"
+    to_version: "1.12"
+    description: "scipy.stats.binom_test removed, use scipy.stats.binomtest instead"
+    replacement: "scipy.stats.binomtest()"
+    has_deterministic_transform: true
+    transform_name: binom_test_to_binomtest
+    notes: "binomtest added in 1.7.0, binom_test deprecated in 1.10.0, removed in 1.12.0. Note: binomtest returns result object with .pvalue attribute."
+
+  - symbol: "scipy.stats.iqr"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.6"
+    to_version: "1.12"
+    description: "scipy.stats.iqr scale='raw' removed, use scale=1 instead"
+    replacement: "scipy.stats.iqr(x, scale=1)"
+    has_deterministic_transform: true
+    transform_name: iqr_scale_raw_to_1
+    notes: "scale='raw' was deprecated, removed in 1.12.0"
+
+  - symbol: "scipy.stats.kendalltau"
+    change_type: behavior_changed
+    severity: low
+    from_version: "1.10"
+    to_version: "1.14"
+    description: "scipy.stats.kendalltau initial_lexsort parameter removed (was unused)"
+    replacement: "Remove initial_lexsort parameter"
+    has_deterministic_transform: true
+    transform_name: kendalltau_remove_initial_lexsort
+    notes: "Parameter was unused, deprecated in 1.10.0, removed in 1.14.0"
+
+  - symbol: "scipy.stats.linregress"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.14"
+    to_version: "1.16"
+    description: "scipy.stats.linregress no longer accepts single 2xN array argument"
+    replacement: "scipy.stats.linregress(x[0], x[1]) or scipy.stats.linregress(x, y)"
+    has_deterministic_transform: false
+    notes: "Inference of two sets from single argument deprecated in 1.14.0, will error in 1.16.0"
+
+  - symbol: "scipy.stats.NumericalInverseHermite"
+    change_type: moved
+    severity: medium
+    from_version: "1.7"
+    to_version: "1.10"
+    description: "NumericalInverseHermite moved from scipy.stats to scipy.stats.sampling"
+    replacement: "scipy.stats.sampling.NumericalInverseHermite"
+    has_deterministic_transform: true
+    transform_name: nih_move_to_sampling
+    notes: "Deprecated in 1.8.0, removed from scipy.stats in 1.10.0. Also tol renamed to u_resolution."
+
+  - symbol: "scipy.stats.qmc.LatinHypercube"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.10"
+    to_version: "1.12"
+    description: "scipy.stats.qmc.LatinHypercube centered parameter removed, use scramble instead"
+    replacement: "LatinHypercube(..., scramble=False) instead of centered=True"
+    has_deterministic_transform: true
+    transform_name: latinhypercube_centered_to_scramble
+    notes: "centered deprecated in 1.10.0, removed in 1.12.0. centered=True maps to scramble=False."
+
+  # scipy.linalg changes
+  - symbol: "scipy.linalg.pinv"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.7"
+    to_version: "1.14"
+    description: "scipy.linalg.pinv cond and rcond parameters removed, use atol and rtol"
+    replacement: "scipy.linalg.pinv(a, atol=..., rtol=...)"
+    has_deterministic_transform: true
+    transform_name: pinv_cond_to_atol_rtol
+    notes: "cond/rcond deprecated in 1.7.0 in favor of atol/rtol, removed in 1.14.0"
+
+  - symbol: "scipy.linalg.eigh"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.5"
+    to_version: "1.14"
+    description: "scipy.linalg.eigh turbo and eigvals parameters removed"
+    replacement: "Use driver='gvd' instead of turbo, subset_by_index instead of eigvals"
+    has_deterministic_transform: true
+    transform_name: eigh_turbo_eigvals_removal
+    notes: "Deprecated in 1.5.0, removed in 1.14.0"
+
+  - symbol: "scipy.linalg.eigvalsh"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.5"
+    to_version: "1.14"
+    description: "scipy.linalg.eigvalsh turbo and eigvals parameters removed"
+    replacement: "Use driver='gvd' instead of turbo, subset_by_index instead of eigvals"
+    has_deterministic_transform: true
+    transform_name: eigvalsh_turbo_eigvals_removal
+    notes: "Deprecated in 1.5.0, removed in 1.14.0"
+
+  # scipy.sparse.linalg changes
+  - symbol: "scipy.sparse.linalg.gmres"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "0.11"
+    to_version: "1.14"
+    description: "scipy.sparse.linalg.gmres restrt parameter removed, use restart"
+    replacement: "scipy.sparse.linalg.gmres(..., restart=...)"
+    has_deterministic_transform: true
+    transform_name: gmres_restrt_to_restart
+    notes: "restrt deprecated since 0.11.0, removed in 1.14.0"
+
+  - symbol: "scipy.sparse.linalg.bicg"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.12"
+    to_version: "1.14"
+    description: "scipy.sparse.linalg.bicg tol parameter removed, use rtol instead"
+    replacement: "scipy.sparse.linalg.bicg(..., rtol=..., atol=0.0)"
+    has_deterministic_transform: true
+    transform_name: bicg_tol_to_rtol
+    notes: "tol deprecated in 1.12.0, removed in 1.14.0. Default atol changed to 0.0."
+
+  - symbol: "scipy.sparse.linalg.cg"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "1.12"
+    to_version: "1.14"
+    description: "scipy.sparse.linalg.cg tol parameter removed, use rtol instead"
+    replacement: "scipy.sparse.linalg.cg(..., rtol=..., atol=0.0)"
+    has_deterministic_transform: true
+    transform_name: cg_tol_to_rtol
+    notes: "tol deprecated in 1.12.0, removed in 1.14.0. Default atol changed to 0.0."
+
+  # scipy.sparse array/matrix method removals (1.14.0)
+  - symbol: "scipy.sparse.csr_matrix.getrow"
+    change_type: removed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.14"
+    description: "getrow method removed from sparse arrays, use indexing instead"
+    replacement: "matrix[i, :] or matrix[[i], :]"
+    has_deterministic_transform: true
+    transform_name: sparse_getrow_to_indexing
+    notes: "Only available on spmatrix, not sparray. Removed in 1.14.0."
+
+  - symbol: "scipy.sparse.csr_matrix.getcol"
+    change_type: removed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.14"
+    description: "getcol method removed from sparse arrays, use indexing instead"
+    replacement: "matrix[:, j] or matrix[:, [j]]"
+    has_deterministic_transform: true
+    transform_name: sparse_getcol_to_indexing
+    notes: "Only available on spmatrix, not sparray. Removed in 1.14.0."
+
+  - symbol: "scipy.sparse.csr_matrix.asfptype"
+    change_type: removed
+    severity: low
+    from_version: "1.0"
+    to_version: "1.14"
+    description: "asfptype method removed from sparse arrays"
+    replacement: "matrix.astype(float) or manual dtype conversion"
+    has_deterministic_transform: false
+    notes: "Only available on spmatrix, not sparray. Removed in 1.14.0."
+
+  - symbol: "scipy.sparse.csr_matrix.A"
+    change_type: removed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.14"
+    description: ".A property removed from sparse arrays, use .toarray() instead"
+    replacement: "matrix.toarray()"
+    has_deterministic_transform: true
+    transform_name: sparse_A_to_toarray
+    notes: "Only available on spmatrix, not sparray. Removed in 1.14.0."
+
+  - symbol: "scipy.sparse.csr_matrix.H"
+    change_type: removed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.14"
+    description: ".H property removed from sparse arrays, use .conjugate().T instead"
+    replacement: "matrix.conjugate().T"
+    has_deterministic_transform: true
+    transform_name: sparse_H_to_conjugate_T
+    notes: "Only available on spmatrix, not sparray. Removed in 1.14.0."
+
+  # scipy.signal wavelet deprecations (deprecated 1.12.0, removed 1.15.0)
+  - symbol: "scipy.signal.cwt"
+    change_type: deprecated
+    severity: medium
+    from_version: "1.12"
+    to_version: "1.15"
+    description: "scipy.signal.cwt deprecated, use PyWavelets instead"
+    replacement: "pywt.cwt() from PyWavelets package"
+    has_deterministic_transform: false
+    notes: "Deprecated in 1.12.0, will be removed in 1.15.0. Requires installing pywavelets."
+
+  - symbol: "scipy.signal.morlet"
+    change_type: deprecated
+    severity: medium
+    from_version: "1.12"
+    to_version: "1.15"
+    description: "scipy.signal.morlet deprecated, use PyWavelets instead"
+    replacement: "PyWavelets morlet wavelets"
+    has_deterministic_transform: false
+    notes: "Deprecated in 1.12.0, will be removed in 1.15.0"
+
+  - symbol: "scipy.signal.morlet2"
+    change_type: deprecated
+    severity: medium
+    from_version: "1.12"
+    to_version: "1.15"
+    description: "scipy.signal.morlet2 deprecated, use PyWavelets instead"
+    replacement: "PyWavelets morlet wavelets"
+    has_deterministic_transform: false
+    notes: "Deprecated in 1.12.0, will be removed in 1.15.0"
+
+  - symbol: "scipy.signal.ricker"
+    change_type: deprecated
+    severity: medium
+    from_version: "1.12"
+    to_version: "1.15"
+    description: "scipy.signal.ricker deprecated, use PyWavelets instead"
+    replacement: "PyWavelets ricker wavelet"
+    has_deterministic_transform: false
+    notes: "Deprecated in 1.12.0, will be removed in 1.15.0"
+
+  - symbol: "scipy.signal.daub"
+    change_type: deprecated
+    severity: medium
+    from_version: "1.12"
+    to_version: "1.15"
+    description: "scipy.signal.daub deprecated, use PyWavelets instead"
+    replacement: "pywt.Wavelet('db...') from PyWavelets"
+    has_deterministic_transform: false
+    notes: "Deprecated in 1.12.0, will be removed in 1.15.0"
+
+  - symbol: "scipy.signal.qmf"
+    change_type: deprecated
+    severity: low
+    from_version: "1.12"
+    to_version: "1.15"
+    description: "scipy.signal.qmf deprecated, use PyWavelets instead"
+    replacement: "PyWavelets qmf functionality"
+    has_deterministic_transform: false
+    notes: "Deprecated in 1.12.0, will be removed in 1.15.0"
+
+  - symbol: "scipy.signal.cascade"
+    change_type: deprecated
+    severity: low
+    from_version: "1.12"
+    to_version: "1.15"
+    description: "scipy.signal.cascade deprecated, use PyWavelets instead"
+    replacement: "PyWavelets cascade functionality"
+    has_deterministic_transform: false
+    notes: "Deprecated in 1.12.0, will be removed in 1.15.0"

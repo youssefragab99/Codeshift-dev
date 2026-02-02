@@ -1,0 +1,510 @@
+# Scikit-learn Knowledge Base
+# Breaking changes from 0.23 to 1.5
+
+name: scikit-learn
+display_name: Scikit-learn
+description: Machine learning library for Python with classification, regression, clustering, and preprocessing tools
+migration_guide_url: https://scikit-learn.org/stable/whats_new.html
+
+supported_migrations:
+  - from: "0.23"
+    to: "1.0"
+  - from: "1.0"
+    to: "1.1"
+  - from: "1.1"
+    to: "1.2"
+  - from: "1.2"
+    to: "1.3"
+  - from: "1.3"
+    to: "1.4"
+  - from: "1.4"
+    to: "1.5"
+
+breaking_changes:
+  # sklearn.externals removals (0.23)
+  - symbol: "sklearn.externals.joblib"
+    change_type: removed
+    severity: high
+    from_version: "0.21"
+    to_version: "0.23"
+    description: "sklearn.externals.joblib removed, import joblib directly"
+    replacement: "import joblib"
+    has_deterministic_transform: true
+    transform_name: externals_joblib_to_joblib
+    notes: "Install joblib separately with pip install joblib"
+
+  - symbol: "sklearn.externals.six"
+    change_type: removed
+    severity: medium
+    from_version: "0.21"
+    to_version: "0.23"
+    description: "sklearn.externals.six removed after dropping Python 2.7 support"
+    replacement: "import six"
+    has_deterministic_transform: true
+    transform_name: externals_six_to_six
+    notes: "Install six separately with pip install six"
+
+  # get_feature_names deprecation (1.0 -> 1.2)
+  - symbol: "get_feature_names"
+    change_type: renamed
+    severity: high
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "get_feature_names() deprecated in favor of get_feature_names_out()"
+    replacement: "get_feature_names_out()"
+    has_deterministic_transform: true
+    transform_name: get_feature_names_to_out
+    notes: "Affects all transformers with get_feature_names method"
+
+  # Loss parameter standardization - squared_error (1.0 -> 1.2)
+  - symbol: "DecisionTreeRegressor.criterion"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "criterion='mse' renamed to criterion='squared_error'"
+    replacement: "criterion='squared_error'"
+    has_deterministic_transform: true
+    transform_name: criterion_mse_to_squared_error
+    notes: "Applies to DecisionTreeRegressor, ExtraTreeRegressor, RandomForestRegressor, ExtraTreesRegressor"
+
+  - symbol: "GradientBoostingRegressor.loss"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "loss='ls' renamed to loss='squared_error'"
+    replacement: "loss='squared_error'"
+    has_deterministic_transform: true
+    transform_name: loss_ls_to_squared_error
+
+  - symbol: "HistGradientBoostingRegressor.loss"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "loss='least_squares' renamed to loss='squared_error'"
+    replacement: "loss='squared_error'"
+    has_deterministic_transform: true
+    transform_name: loss_least_squares_to_squared_error
+
+  - symbol: "SGDRegressor.loss"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "loss='squared_loss' renamed to loss='squared_error'"
+    replacement: "loss='squared_error'"
+    has_deterministic_transform: true
+    transform_name: loss_squared_loss_to_squared_error
+    notes: "Also applies to RANSACRegressor"
+
+  # Loss parameter standardization - absolute_error (1.0 -> 1.2)
+  - symbol: "DecisionTreeRegressor.criterion_mae"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "criterion='mae' renamed to criterion='absolute_error'"
+    replacement: "criterion='absolute_error'"
+    has_deterministic_transform: true
+    transform_name: criterion_mae_to_absolute_error
+    notes: "Applies to DecisionTreeRegressor, ExtraTreeRegressor, RandomForestRegressor, ExtraTreesRegressor"
+
+  - symbol: "GradientBoostingRegressor.loss_lad"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "loss='lad' renamed to loss='absolute_error'"
+    replacement: "loss='absolute_error'"
+    has_deterministic_transform: true
+    transform_name: loss_lad_to_absolute_error
+
+  - symbol: "HistGradientBoostingRegressor.loss_lad"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "loss='least_absolute_deviation' renamed to loss='absolute_error'"
+    replacement: "loss='absolute_error'"
+    has_deterministic_transform: true
+    transform_name: loss_least_absolute_deviation_to_absolute_error
+
+  # Loss parameter standardization - log_loss (1.1 -> 1.3)
+  - symbol: "GradientBoostingClassifier.loss"
+    change_type: renamed
+    severity: medium
+    from_version: "1.1"
+    to_version: "1.3"
+    description: "loss='deviance' renamed to loss='log_loss'"
+    replacement: "loss='log_loss'"
+    has_deterministic_transform: true
+    transform_name: loss_deviance_to_log_loss
+
+  - symbol: "HistGradientBoostingClassifier.loss"
+    change_type: renamed
+    severity: medium
+    from_version: "1.1"
+    to_version: "1.3"
+    description: "loss='auto', 'binary_crossentropy', 'categorical_crossentropy' renamed to loss='log_loss'"
+    replacement: "loss='log_loss'"
+    has_deterministic_transform: true
+    transform_name: loss_crossentropy_to_log_loss
+
+  - symbol: "SGDClassifier.loss"
+    change_type: renamed
+    severity: medium
+    from_version: "1.1"
+    to_version: "1.3"
+    description: "loss='log' renamed to loss='log_loss'"
+    replacement: "loss='log_loss'"
+    has_deterministic_transform: true
+    transform_name: loss_log_to_log_loss
+
+  # normalize parameter deprecation (1.0 -> 1.2)
+  - symbol: "LinearRegression.normalize"
+    change_type: removed
+    severity: high
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "normalize parameter removed, use Pipeline with StandardScaler instead"
+    replacement: "make_pipeline(StandardScaler(with_mean=False), LinearRegression())"
+    has_deterministic_transform: false
+    notes: "Applies to Ridge, RidgeClassifier, Lasso, ElasticNet, BayesianRidge, ARDRegression and their CV variants"
+
+  # KMeans algorithm default change (1.1 -> 1.3)
+  - symbol: "KMeans.algorithm"
+    change_type: renamed
+    severity: medium
+    from_version: "1.1"
+    to_version: "1.3"
+    description: "algorithm='auto' and 'full' deprecated, use algorithm='lloyd'"
+    replacement: "algorithm='lloyd'"
+    has_deterministic_transform: true
+    transform_name: kmeans_algorithm_to_lloyd
+    notes: "Lloyd's algorithm is now the default and only option for 'auto'"
+
+  # RandomForest max_features default change (1.1 -> 1.3)
+  - symbol: "RandomForestClassifier.max_features"
+    change_type: renamed
+    severity: medium
+    from_version: "1.1"
+    to_version: "1.3"
+    description: "max_features='auto' deprecated, use max_features='sqrt' for classifiers"
+    replacement: "max_features='sqrt'"
+    has_deterministic_transform: true
+    transform_name: max_features_auto_to_sqrt
+    notes: "Also applies to ExtraTreesClassifier"
+
+  - symbol: "RandomForestRegressor.max_features"
+    change_type: renamed
+    severity: medium
+    from_version: "1.1"
+    to_version: "1.3"
+    description: "max_features='auto' deprecated, use max_features=1.0 for regressors"
+    replacement: "max_features=1.0"
+    has_deterministic_transform: true
+    transform_name: max_features_auto_to_1
+    notes: "Also applies to ExtraTreesRegressor"
+
+  # base_estimator -> estimator rename (1.1 -> 1.4)
+  - symbol: "RANSACRegressor.base_estimator"
+    change_type: renamed
+    severity: medium
+    from_version: "1.1"
+    to_version: "1.3"
+    description: "base_estimator parameter renamed to estimator"
+    replacement: "estimator=LinearRegression()"
+    has_deterministic_transform: true
+    transform_name: base_estimator_to_estimator
+
+  - symbol: "AdaBoostClassifier.base_estimator"
+    change_type: renamed
+    severity: medium
+    from_version: "1.2"
+    to_version: "1.4"
+    description: "base_estimator parameter renamed to estimator"
+    replacement: "estimator=DecisionTreeClassifier()"
+    has_deterministic_transform: true
+    transform_name: adaboost_base_estimator_to_estimator
+    notes: "Also applies to AdaBoostRegressor, BaggingClassifier, BaggingRegressor, CalibratedClassifierCV"
+
+  # base_estimator_ -> estimator_ attribute rename (1.2 -> 1.4)
+  - symbol: "BaggingClassifier.base_estimator_"
+    change_type: renamed
+    severity: medium
+    from_version: "1.2"
+    to_version: "1.4"
+    description: "base_estimator_ attribute renamed to estimator_"
+    replacement: "estimator_"
+    has_deterministic_transform: true
+    transform_name: base_estimator_attr_to_estimator
+    notes: "Applies to all ensemble estimators with base_estimator_"
+
+  # affinity -> metric rename in clustering (1.2 -> 1.4)
+  - symbol: "AgglomerativeClustering.affinity"
+    change_type: renamed
+    severity: medium
+    from_version: "1.2"
+    to_version: "1.4"
+    description: "affinity parameter renamed to metric"
+    replacement: "metric='euclidean'"
+    has_deterministic_transform: true
+    transform_name: affinity_to_metric
+
+  # sparse -> sparse_output rename (1.2 -> 1.4)
+  - symbol: "OneHotEncoder.sparse"
+    change_type: renamed
+    severity: medium
+    from_version: "1.2"
+    to_version: "1.4"
+    description: "sparse parameter renamed to sparse_output"
+    replacement: "sparse_output=True"
+    has_deterministic_transform: true
+    transform_name: sparse_to_sparse_output
+
+  # KernelPCA attribute renames (1.0 -> 1.2)
+  - symbol: "KernelPCA.lambdas_"
+    change_type: renamed
+    severity: low
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "lambdas_ attribute renamed to eigenvalues_"
+    replacement: "eigenvalues_"
+    has_deterministic_transform: true
+    transform_name: lambdas_to_eigenvalues
+
+  - symbol: "KernelPCA.alphas_"
+    change_type: renamed
+    severity: low
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "alphas_ attribute renamed to eigenvectors_"
+    replacement: "eigenvectors_"
+    has_deterministic_transform: true
+    transform_name: alphas_to_eigenvectors
+
+  # GaussianNB sigma_ -> var_ (1.0 -> 1.2)
+  - symbol: "GaussianNB.sigma_"
+    change_type: renamed
+    severity: low
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "sigma_ attribute renamed to var_"
+    replacement: "var_"
+    has_deterministic_transform: true
+    transform_name: sigma_to_var
+
+  # Plot function deprecations (1.0 -> 1.2)
+  - symbol: "plot_confusion_matrix"
+    change_type: removed
+    severity: high
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "plot_confusion_matrix function removed, use ConfusionMatrixDisplay class methods"
+    replacement: "ConfusionMatrixDisplay.from_estimator() or ConfusionMatrixDisplay.from_predictions()"
+    has_deterministic_transform: false
+    notes: "Similar changes for plot_precision_recall_curve, plot_det_curve, plot_partial_dependence"
+
+  - symbol: "plot_precision_recall_curve"
+    change_type: removed
+    severity: high
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "plot_precision_recall_curve function removed, use PrecisionRecallDisplay class methods"
+    replacement: "PrecisionRecallDisplay.from_estimator() or PrecisionRecallDisplay.from_predictions()"
+    has_deterministic_transform: false
+
+  # datasets.load_boston removal (1.0 -> 1.2)
+  - symbol: "datasets.load_boston"
+    change_type: removed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "load_boston dataset removed due to ethical concerns"
+    replacement: "Use fetch_california_housing or other datasets"
+    has_deterministic_transform: false
+    notes: "Boston housing dataset had ethical issues with racial discrimination variables"
+
+  # NMF parameter changes (1.0 -> 1.2)
+  - symbol: "NMF.alpha"
+    change_type: renamed
+    severity: medium
+    from_version: "1.0"
+    to_version: "1.2"
+    description: "alpha parameter split into alpha_W and alpha_H"
+    replacement: "alpha_W=0.0, alpha_H='same'"
+    has_deterministic_transform: false
+    notes: "Allows separate regularization for W and H matrices"
+
+  # LogisticRegression penalty=None (1.2 -> 1.4)
+  - symbol: "LogisticRegression.penalty_none"
+    change_type: renamed
+    severity: low
+    from_version: "1.2"
+    to_version: "1.4"
+    description: "penalty='none' (string) deprecated, use penalty=None"
+    replacement: "penalty=None"
+    has_deterministic_transform: true
+    transform_name: penalty_none_string_to_none
+
+  # n_iter -> max_iter renames (1.3 -> 1.5)
+  - symbol: "BayesianRidge.n_iter"
+    change_type: renamed
+    severity: medium
+    from_version: "1.3"
+    to_version: "1.5"
+    description: "n_iter parameter renamed to max_iter for consistency"
+    replacement: "max_iter=300"
+    has_deterministic_transform: true
+    transform_name: n_iter_to_max_iter
+    notes: "Also applies to ARDRegression"
+
+  - symbol: "TSNE.n_iter"
+    change_type: renamed
+    severity: medium
+    from_version: "1.5"
+    to_version: "1.7"
+    description: "n_iter parameter renamed to max_iter for consistency"
+    replacement: "max_iter=1000"
+    has_deterministic_transform: true
+    transform_name: tsne_n_iter_to_max_iter
+
+  # squared parameter deprecation (1.4 -> 1.6)
+  - symbol: "mean_squared_error.squared"
+    change_type: deprecated
+    severity: medium
+    from_version: "1.4"
+    to_version: "1.6"
+    description: "squared parameter deprecated, use separate RMSE functions"
+    replacement: "Use root_mean_squared_error() instead of mean_squared_error(squared=False)"
+    has_deterministic_transform: true
+    transform_name: mse_squared_false_to_rmse
+    notes: "Also applies to mean_squared_log_error -> root_mean_squared_log_error"
+
+  # make_scorer parameter changes (1.4 -> 1.6)
+  - symbol: "make_scorer.needs_proba"
+    change_type: renamed
+    severity: medium
+    from_version: "1.4"
+    to_version: "1.6"
+    description: "needs_proba parameter deprecated, use response_method='predict_proba'"
+    replacement: "response_method='predict_proba'"
+    has_deterministic_transform: true
+    transform_name: needs_proba_to_response_method
+
+  - symbol: "make_scorer.needs_threshold"
+    change_type: renamed
+    severity: medium
+    from_version: "1.4"
+    to_version: "1.6"
+    description: "needs_threshold parameter deprecated, use response_method"
+    replacement: "response_method=('decision_function', 'predict_proba')"
+    has_deterministic_transform: true
+    transform_name: needs_threshold_to_response_method
+
+  # PLS Y -> y parameter change (1.5 -> 1.7)
+  - symbol: "PLSRegression.Y"
+    change_type: renamed
+    severity: medium
+    from_version: "1.5"
+    to_version: "1.7"
+    description: "Y parameter deprecated in fit/transform/inverse_transform, use lowercase y"
+    replacement: "y=target_data"
+    has_deterministic_transform: true
+    transform_name: pls_Y_to_y
+    notes: "Applies to PLSRegression, PLSCanonical, CCA, PLSSVD"
+
+  # RidgeCV store_cv_values -> store_cv_results (1.5 -> 1.7)
+  - symbol: "RidgeCV.store_cv_values"
+    change_type: renamed
+    severity: low
+    from_version: "1.5"
+    to_version: "1.7"
+    description: "store_cv_values parameter renamed to store_cv_results"
+    replacement: "store_cv_results=True"
+    has_deterministic_transform: true
+    transform_name: store_cv_values_to_results
+    notes: "Also applies to RidgeClassifierCV, attribute cv_values_ renamed to cv_results_"
+
+  # LogisticRegression multi_class deprecation (1.5 -> 1.8)
+  - symbol: "LogisticRegression.multi_class"
+    change_type: deprecated
+    severity: medium
+    from_version: "1.5"
+    to_version: "1.8"
+    description: "multi_class parameter deprecated, multinomial will be used by default for 3+ classes"
+    replacement: "Use OneVsRestClassifier(LogisticRegression()) for ovr behavior"
+    has_deterministic_transform: false
+    notes: "Binary classification unaffected"
+
+  # PassiveAggressive average=0 deprecation (1.5 -> 1.7)
+  - symbol: "SGDClassifier.average_zero"
+    change_type: renamed
+    severity: low
+    from_version: "1.5"
+    to_version: "1.7"
+    description: "average=0 deprecated for disabling averaging, use average=False"
+    replacement: "average=False"
+    has_deterministic_transform: true
+    transform_name: average_zero_to_false
+    notes: "Applies to SGDClassifier, SGDRegressor, PassiveAggressiveClassifier, PassiveAggressiveRegressor"
+
+  # precision_recall_curve parameter rename (1.5 -> 1.7)
+  - symbol: "precision_recall_curve.probas_pred"
+    change_type: renamed
+    severity: low
+    from_version: "1.5"
+    to_version: "1.7"
+    description: "probas_pred parameter renamed to y_score"
+    replacement: "y_score=probabilities"
+    has_deterministic_transform: true
+    transform_name: probas_pred_to_y_score
+
+  # brier_score_loss parameter rename (1.5 -> 1.7)
+  - symbol: "brier_score_loss.y_prob"
+    change_type: renamed
+    severity: low
+    from_version: "1.5"
+    to_version: "1.7"
+    description: "y_prob parameter renamed to y_proba"
+    replacement: "y_proba=probabilities"
+    has_deterministic_transform: true
+    transform_name: y_prob_to_y_proba
+
+  # utils.parallel_backend deprecation (1.5 -> 1.7)
+  - symbol: "utils.parallel_backend"
+    change_type: moved
+    severity: medium
+    from_version: "1.5"
+    to_version: "1.7"
+    description: "sklearn.utils.parallel_backend deprecated, use joblib directly"
+    replacement: "from joblib import parallel_backend"
+    has_deterministic_transform: true
+    transform_name: utils_parallel_to_joblib
+    notes: "Also applies to utils.register_parallel_backend"
+
+  # HDBSCAN algorithm naming (1.4 -> 1.6)
+  - symbol: "HDBSCAN.algorithm_kdtree"
+    change_type: renamed
+    severity: low
+    from_version: "1.4"
+    to_version: "1.6"
+    description: "algorithm='kdtree' deprecated, use algorithm='kd_tree'"
+    replacement: "algorithm='kd_tree'"
+    has_deterministic_transform: true
+    transform_name: hdbscan_kdtree_to_kd_tree
+    notes: "Also algorithm='balltree' -> 'ball_tree'"
+
+  # Inverse transform Xt -> X parameter (1.5 -> 1.7)
+  - symbol: "inverse_transform.Xt"
+    change_type: renamed
+    severity: low
+    from_version: "1.5"
+    to_version: "1.7"
+    description: "Xt parameter in inverse_transform deprecated, use X"
+    replacement: "inverse_transform(X=data)"
+    has_deterministic_transform: true
+    transform_name: inverse_transform_Xt_to_X
+    notes: "Applies to FeatureAgglomeration, NMF, MiniBatchNMF, Pipeline, GridSearchCV, etc."

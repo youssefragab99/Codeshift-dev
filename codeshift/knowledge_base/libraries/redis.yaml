@@ -1,0 +1,283 @@
+# Redis-py Knowledge Base
+# Breaking changes from v3.x to v4.x and v4.x to v5.x
+
+name: redis
+display_name: Redis-py
+description: Python client library for Redis key-value store
+migration_guide_url: https://github.com/redis/redis-py/releases
+
+supported_migrations:
+  - from: "3.0"
+    to: "4.0"
+  - from: "4.0"
+    to: "5.0"
+
+breaking_changes:
+  # Python version support changes
+  - symbol: "python_version"
+    change_type: removed
+    severity: high
+    from_version: "4.0"
+    to_version: "5.0"
+    description: "Python 3.7 support dropped in v5.0 due to Python 3.7 EOL"
+    replacement: "Upgrade to Python 3.8+ (Python 3.10+ recommended)"
+    has_deterministic_transform: false
+    notes: "redis-py 5.0 is the last version with Python 3.7 support"
+
+  # StrictRedis class renaming
+  - symbol: "StrictRedis"
+    change_type: deprecated
+    severity: low
+    from_version: "2.0"
+    to_version: "3.0"
+    description: "StrictRedis renamed to Redis, StrictRedis kept as alias"
+    replacement: "from redis import Redis"
+    has_deterministic_transform: true
+    transform_name: strictredis_to_redis
+    notes: "StrictRedis still works as an alias but Redis is preferred"
+
+  # Lock class changes
+  - symbol: "LuaLock"
+    change_type: renamed
+    severity: medium
+    from_version: "2.0"
+    to_version: "3.0"
+    description: "LuaLock class renamed to Lock, pipeline-based Lock removed"
+    replacement: "from redis.lock import Lock"
+    has_deterministic_transform: true
+    transform_name: lualock_to_lock
+    notes: "Requires Redis server 2.6 or greater for Lua script support"
+
+  - symbol: "Lock.acquire"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "4.3.1"
+    to_version: "4.3.2"
+    description: "Lock.acquire() no longer accepts positional boolean argument"
+    replacement: "lock.acquire(blocking=False)"
+    has_deterministic_transform: true
+    transform_name: lock_acquire_blocking_kwarg
+    notes: "lock.acquire(False) must become lock.acquire(blocking=False)"
+
+  - symbol: "Lock context manager"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "2.0"
+    to_version: "3.0"
+    description: "Lock now raises LockError when used as context manager and lock cannot be acquired within timeout"
+    replacement: "Handle LockError exception in context manager usage"
+    has_deterministic_transform: false
+    notes: "Previously failed silently, now raises LockError"
+
+  # SETEX argument order change
+  - symbol: "Redis.setex"
+    change_type: behavior_changed
+    severity: high
+    from_version: "2.0"
+    to_version: "3.0"
+    description: "SETEX argument order changed from (name, value, time) to (name, time, value)"
+    replacement: "redis.setex(name, time, value) or redis.set(name, value, ex=time)"
+    has_deterministic_transform: true
+    transform_name: setex_arg_order
+    notes: "Recommended to use set() with ex parameter instead"
+
+  # LREM argument order change
+  - symbol: "Redis.lrem"
+    change_type: behavior_changed
+    severity: high
+    from_version: "2.0"
+    to_version: "3.0"
+    description: "LREM argument order changed to match Redis command order"
+    replacement: "redis.lrem(name, count, value)"
+    has_deterministic_transform: true
+    transform_name: lrem_arg_order
+    notes: "Arguments now match official Redis LREM command signature"
+
+  # SCAN cursor return type change
+  - symbol: "Redis.scan"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "2.0"
+    to_version: "3.0"
+    description: "SCAN commands now return integer cursor instead of string"
+    replacement: "Change cursor comparison from cursor != '0' to cursor != 0"
+    has_deterministic_transform: true
+    transform_name: scan_cursor_int
+    notes: "Affects scan, hscan, sscan, zscan commands"
+
+  # Encoding parameter changes
+  - symbol: "Redis(charset=...)"
+    change_type: deprecated
+    severity: medium
+    from_version: "2.0"
+    to_version: "3.0"
+    description: "charset parameter deprecated in favor of encoding"
+    replacement: "Redis(encoding='utf-8')"
+    has_deterministic_transform: true
+    transform_name: charset_to_encoding
+    notes: "charset still works but emits DeprecationWarning"
+
+  - symbol: "Redis(errors=...)"
+    change_type: deprecated
+    severity: low
+    from_version: "2.0"
+    to_version: "3.0"
+    description: "errors parameter deprecated in favor of encoding_errors"
+    replacement: "Redis(encoding_errors='strict')"
+    has_deterministic_transform: true
+    transform_name: errors_to_encoding_errors
+    notes: "errors still works but emits DeprecationWarning"
+
+  # aioredis merger changes (v4.2+)
+  - symbol: "aioredis"
+    change_type: moved
+    severity: high
+    from_version: "4.1"
+    to_version: "4.2"
+    description: "aioredis library merged into redis-py, import path changed"
+    replacement: "from redis import asyncio as aioredis"
+    has_deterministic_transform: true
+    transform_name: aioredis_import
+    notes: "aioredis package is now archived, use redis.asyncio instead"
+
+  - symbol: "aioredis.create_pool"
+    change_type: removed
+    severity: high
+    from_version: "4.1"
+    to_version: "4.2"
+    description: "aioredis.create_pool() factory removed, use Redis class directly"
+    replacement: "redis.asyncio.Redis()"
+    has_deterministic_transform: false
+    notes: "Connection pool is now lazy-filled instead of pre-filled"
+
+  - symbol: "aioredis command encoding"
+    change_type: removed
+    severity: medium
+    from_version: "4.1"
+    to_version: "4.2"
+    description: "Per-command encoding parameter removed (e.g., .get(encoding='utf-8'))"
+    replacement: "Set encoding globally on connection: Redis(encoding='utf-8')"
+    has_deterministic_transform: false
+    notes: "Command-level encoding support dropped in aioredis 2.0/redis-py async"
+
+  - symbol: "AsyncRedis.aclose"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "4.1"
+    to_version: "4.2"
+    description: "Async Redis requires explicit disconnect, no asyncio destructor magic"
+    replacement: "await redis_client.aclose()"
+    has_deterministic_transform: false
+    notes: "Must explicitly close async connections to avoid resource leaks"
+
+  # RedisCluster additions (v4.1+)
+  - symbol: "redis_cluster.StrictRedisCluster"
+    change_type: moved
+    severity: high
+    from_version: "4.0"
+    to_version: "4.1"
+    description: "redis-py-cluster merged into redis-py as RedisCluster"
+    replacement: "from redis.cluster import RedisCluster"
+    has_deterministic_transform: true
+    transform_name: redis_cluster_import
+    notes: "redis-py-cluster package superseded by built-in RedisCluster"
+
+  # Connection pool behavior changes
+  - symbol: "ConnectionPool max_connections"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "4.3"
+    to_version: "4.4"
+    description: "Connection pool raises ConnectionError instead of blocking when limit reached"
+    replacement: "Use BlockingConnectionPool for blocking behavior"
+    has_deterministic_transform: false
+    notes: "Default ConnectionPool now raises error, use BlockingConnectionPool to wait"
+
+  - symbol: "AbstractConnection.register_connect_callback"
+    change_type: removed
+    severity: low
+    from_version: "4.6"
+    to_version: "5.0"
+    description: "register_connect_callback made private (_register_connect_callback)"
+    replacement: "Use _register_connect_callback (internal API)"
+    has_deterministic_transform: true
+    transform_name: register_connect_callback_private
+    notes: "Public API removed, now internal implementation detail"
+
+  # RESP3 protocol support (v5.0+)
+  - symbol: "Redis(protocol=...)"
+    change_type: behavior_changed
+    severity: low
+    from_version: "4.0"
+    to_version: "5.0"
+    description: "RESP3 protocol support added, changes response types when enabled"
+    replacement: "Redis(protocol=3) for RESP3, default is RESP2"
+    has_deterministic_transform: false
+    notes: "RESP3 provides native doubles, booleans, maps; faster but may change response types"
+
+  # OSError to ConnectionError (v4.3+)
+  - symbol: "ConnectionPool.can_read"
+    change_type: behavior_changed
+    severity: medium
+    from_version: "4.2"
+    to_version: "4.3"
+    description: "can_read() raises redis.ConnectionError instead of OSError"
+    replacement: "Catch redis.ConnectionError instead of OSError"
+    has_deterministic_transform: false
+    notes: "Exception type changed for consistency"
+
+  # Pipeline command_stack attribute (v6.0+)
+  - symbol: "Pipeline.command_stack"
+    change_type: moved
+    severity: low
+    from_version: "5.0"
+    to_version: "6.0"
+    description: "Pipeline.command_stack moved to internal execution strategy"
+    replacement: "Use self._execution_strategy.command_queue"
+    has_deterministic_transform: false
+    notes: "Affects tracing libraries that inspect command_stack"
+
+  # Health check feature (v3.0+)
+  - symbol: "Redis(health_check_interval=...)"
+    change_type: behavior_changed
+    severity: low
+    from_version: "2.0"
+    to_version: "3.0"
+    description: "New health_check_interval parameter added, default 0 (disabled)"
+    replacement: "Redis(health_check_interval=30) to enable health checks"
+    has_deterministic_transform: false
+    notes: "Positive integer enables periodic connection health checks"
+
+  # Deprecation notices for legacy commands
+  - symbol: "Redis.setnx"
+    change_type: deprecated
+    severity: low
+    from_version: "4.0"
+    to_version: "5.0"
+    description: "SETNX command deprecated by Redis, may be removed in future"
+    replacement: "redis.set(name, value, nx=True)"
+    has_deterministic_transform: true
+    transform_name: setnx_to_set_nx
+    notes: "SET with NX option is the recommended approach"
+
+  - symbol: "Redis.psetex"
+    change_type: deprecated
+    severity: low
+    from_version: "4.0"
+    to_version: "5.0"
+    description: "PSETEX command deprecated by Redis, may be removed in future"
+    replacement: "redis.set(name, value, px=milliseconds)"
+    has_deterministic_transform: true
+    transform_name: psetex_to_set_px
+    notes: "SET with PX option is the recommended approach"
+
+  - symbol: "Redis.getset"
+    change_type: deprecated
+    severity: low
+    from_version: "4.0"
+    to_version: "5.0"
+    description: "GETSET command deprecated by Redis in favor of SET with GET option"
+    replacement: "redis.set(name, value, get=True)"
+    has_deterministic_transform: true
+    transform_name: getset_to_set_get
+    notes: "SET with GET option returns old value like GETSET"
